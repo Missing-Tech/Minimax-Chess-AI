@@ -1,0 +1,394 @@
+fileFormatVersion: 2
+guid: f5e4e130b0a5a2d409cfd8537512b46a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4457927611344654258
+    second: black_pawn
+  - first:
+      213: 4679257492316998072
+    second: black_rook
+  - first:
+      213: 6963704906390624885
+    second: black_knight
+  - first:
+      213: -5122237173650675290
+    second: black_bishop
+  - first:
+      213: -7074636871631259346
+    second: black_queen
+  - first:
+      213: 8581231921916299999
+    second: black_king
+  - first:
+      213: -1474079516460935116
+    second: white_pawn
+  - first:
+      213: 4047604414938549481
+    second: white_rook
+  - first:
+      213: 5450983361582785177
+    second: white_knight
+  - first:
+      213: -4771049297806466616
+    second: white_bishop
+  - first:
+      213: -5495568106450205708
+    second: white_queen
+  - first:
+      213: -4422074714288295774
+    second: white_king
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: black_pawn
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e407563e4724222c0800000000000000
+      internalID: -4457927611344654258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black_rook
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b9c322c5ef00f040800000000000000
+      internalID: 4679257492316998072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black_knight
+      rect:
+        serializedVersion: 2
+        x: 1588
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57ade0297bc04a060800000000000000
+      internalID: 6963704906390624885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black_bishop
+      rect:
+        serializedVersion: 2
+        x: 2382
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a92049ed682ae8b0800000000000000
+      internalID: -5122237173650675290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black_queen
+      rect:
+        serializedVersion: 2
+        x: 3170
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e29b98f8f37d1dd90800000000000000
+      internalID: -7074636871631259346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: black_king
+      rect:
+        serializedVersion: 2
+        x: 3970
+        y: 794
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fda4019b7f8a61770800000000000000
+      internalID: 8581231921916299999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_pawn
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4389aa26d740b8be0800000000000000
+      internalID: -1474079516460935116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_rook
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ec07bf25cafb2830800000000000000
+      internalID: 4047604414938549481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_knight
+      rect:
+        serializedVersion: 2
+        x: 1588
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 992e4bf9c78c5ab40800000000000000
+      internalID: 5450983361582785177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_bishop
+      rect:
+        serializedVersion: 2
+        x: 2382
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c16e5611f3d9cdb0800000000000000
+      internalID: -4771049297806466616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_queen
+      rect:
+        serializedVersion: 2
+        x: 3176
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f3c1188ce1dbb3b0800000000000000
+      internalID: -5495568106450205708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: white_king
+      rect:
+        serializedVersion: 2
+        x: 3970
+        y: 0
+        width: 794
+        height: 794
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a0fb9cf972a1a2c0800000000000000
+      internalID: -4422074714288295774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
