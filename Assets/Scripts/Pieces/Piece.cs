@@ -1,18 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class Piece : MonoBehaviour
+public abstract class Piece : EventTrigger
 {
-    // Start is called before the first frame update
-    void Start()
+    protected Sprite pieceSprite;
+    
+    public virtual void Init()
     {
-        
+        //todo
     }
 
-    // Update is called once per frame
-    void Update()
+    public Sprite PieceSprite
     {
-        
+        get => pieceSprite;
+        set
+        {
+            pieceSprite = value;
+            ChangeSprite();
+        }
+    }
+
+    protected void ChangeSprite()
+    {
+        GetComponent<Image>().sprite = pieceSprite;
     }
 }

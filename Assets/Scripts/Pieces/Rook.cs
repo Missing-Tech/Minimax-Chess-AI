@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Piece : MonoBehaviour
+public class Rook : Piece
 {
     // Start is called before the first frame update
     void Start()

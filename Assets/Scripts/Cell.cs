@@ -18,5 +18,10 @@ public class Cell : MonoBehaviour
 
       rectTransform = GetComponent<RectTransform>();
    }
+
+   public Vector2 GetWorldPos()
+   {
+      return transform.position;
+   }
    
 }

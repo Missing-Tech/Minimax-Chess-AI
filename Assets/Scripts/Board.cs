@@ -44,6 +44,7 @@ public class Board : MonoBehaviour
                 cellGrid[offsetX, y].cellImage.color = Colours.ColourValue(PaleBrown);
             }
         }
+        FindObjectOfType<BoardManager>().SpawnPieces();
     }
     
 }
