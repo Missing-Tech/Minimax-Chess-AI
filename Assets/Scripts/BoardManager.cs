@@ -41,12 +41,22 @@ public class BoardManager : MonoBehaviour
     {
         for (int x = 0; x < 8; x++)
         {
+            //Gets the cell where to spawn the piece
+            //More performant than multiple calls to the array
             var spawnedPieceCell = board.cellGrid[x, cellColumn];
             GameObject spawnedPiece = Instantiate(pieceObject,spawnedPieceCell.transform);
             spawnedPiece.transform.position = spawnedPieceCell.GetWorldPos();
+            spawnedPiece.transform.parent = transform;
+            
+            //Checks what piece type it should be
             var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[royalRow[x]];
             spawnedPiece.AddComponent(pieceType);
-            spawnedPiece.GetComponent<Piece>().PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[royalRow[x]];
+            
+            //Stores the piece component since it's called multiple times
+            var pieceComponent = spawnedPiece.GetComponent<Piece>();
+            pieceComponent.PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[royalRow[x]];
+            pieceComponent.Init(spawnedPieceCell);
+            
             if (whitePiece)
             {
                 whitePieces.Add(spawnedPiece.GetComponent<Piece>());

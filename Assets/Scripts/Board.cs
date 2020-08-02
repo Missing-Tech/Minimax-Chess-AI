@@ -38,6 +38,7 @@ public class Board : MonoBehaviour
             {
                 int offsetX = x;
 
+                //Offsets the grid every 2nd row to make a checkerboard pattern
                 if (y % 2 == 0)
                     offsetX += 1;
 
