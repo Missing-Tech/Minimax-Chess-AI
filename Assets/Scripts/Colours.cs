@@ -12,9 +12,9 @@ public class Colours
         PaleBrown,
         PaleGreen,
         Red,
-        LightRed,
+        White,
         Blue,
-        LightBlue,
+        Black,
     }
     
     private static Hashtable colourValues = new Hashtable
@@ -23,9 +23,9 @@ public class Colours
         {ColourNames.PaleBrown, new Color32(187,164,150,255 )},
         {ColourNames.PaleGreen, new Color32(166,179,149,255)},
         {ColourNames.Red, new Color32(226,102,98,255)},
-        {ColourNames.LightRed, new Color32(225,121,116,255)},
+        {ColourNames.White, new Color32(255,255,255,255)},
         {ColourNames.Blue, new Color32(27,68,89,255)},
-        {ColourNames.LightBlue, new Color32(63,158,160,255)},
+        {ColourNames.Black, new Color32(130,130,130,255)},
     };
 
     public static Color32 ColourValue(ColourNames colour)

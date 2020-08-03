@@ -8,7 +8,10 @@ public class Cell : MonoBehaviour
    public Image cellImage;
    public Board board;
    public Vector2Int cellPos;
-   private RectTransform rectTransform;
+   [HideInInspector]
+   public RectTransform rectTransform;
+   [HideInInspector] 
+   public Piece currentPiece;
    private GameObject outline;
    
    public void Init(Board board, Vector2Int cellPos)
@@ -26,6 +29,34 @@ public class Cell : MonoBehaviour
    public void SetOutline(bool active)
    {
       outline.SetActive(active);
+   }
+
+   public void SetPiece(Piece newPiece)
+   {
+      if (currentPiece != null && !currentPiece.PieceColor.Equals(newPiece.PieceColor))
+      {
+         currentPiece.gameObject.SetActive(false);
+         RemovePiece();
+      }
+      currentPiece = newPiece;
+   }
+
+   public void RemovePiece()
+   {
+      currentPiece = null;
+   }
+
+   public bool CheckIfValid(Color32 pieceColour)
+   {
+      if (currentPiece == null)
+      {
+         return true;
+      }
+      if (currentPiece.PieceColor.Equals(pieceColour))
+      {
+         return false;
+      }
+      return true;
    }
    
    public Vector2 GetWorldPos()

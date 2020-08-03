@@ -47,7 +47,7 @@ public class BoardManager : MonoBehaviour
             GameObject spawnedPiece = Instantiate(pieceObject,spawnedPieceCell.transform);
             spawnedPiece.transform.position = spawnedPieceCell.GetWorldPos();
             spawnedPiece.transform.parent = transform;
-            
+
             //Checks what piece type it should be
             var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[royalRow[x]];
             spawnedPiece.AddComponent(pieceType);
@@ -55,17 +55,17 @@ public class BoardManager : MonoBehaviour
             //Stores the piece component since it's called multiple times
             var pieceComponent = spawnedPiece.GetComponent<Piece>();
             pieceComponent.PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[royalRow[x]];
-            pieceComponent.Init(spawnedPieceCell);
+            spawnedPieceCell.SetPiece(pieceComponent);
             
             if (whitePiece)
             {
                 whitePieces.Add(spawnedPiece.GetComponent<Piece>());
-                spawnedPiece.GetComponent<Image>().color = Colours.ColourValue(LightRed);
+                pieceComponent.Init(spawnedPieceCell, Colours.ColourValue(White));
             }
             else
             {
                 blackPieces.Add(spawnedPiece.GetComponent<Piece>());
-                spawnedPiece.GetComponent<Image>().color = Colours.ColourValue(LightBlue);
+                pieceComponent.Init(spawnedPieceCell,Colours.ColourValue(Black));
             }
         }
     }

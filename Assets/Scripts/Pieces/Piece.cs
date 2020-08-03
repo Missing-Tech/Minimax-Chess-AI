@@ -10,7 +10,7 @@ public abstract class Piece : EventTrigger
 {
     protected Sprite pieceSprite;
     protected Cell cell;
-    protected Color pieceColor;
+    protected Color32 pieceColor;
     protected GameObject outline;
     
     public enum Directions
@@ -41,45 +41,73 @@ public abstract class Piece : EventTrigger
 
     protected Directions[] availableDirections = new Directions[]
         {Directions.North,Directions.NorthEast,Directions.NorthWest};
-    protected List<Cell> availableCells;
+    public List<Cell> availableCells = new List<Cell>();
     
-    public virtual void Init(Cell cell)
+    public virtual void Init(Cell cell, Color32 pieceColour)
     {
         outline = transform.GetChild(0).gameObject;
         outline.SetActive(false);
         this.cell = cell;
-        pieceSprite = GetComponent<Image>().sprite;
-        pieceColor = GetComponent<Image>().color;
+        Image pieceImage = GetComponent<Image>();
+        pieceSprite = pieceImage.sprite;
+        pieceImage.color = pieceColour;
+        pieceColor = pieceColour;
     }
 
     public virtual void FindValidMoves()
     {
         foreach (var direction in availableDirections)
         {
-            for (int i = 0; i < radius; i++)
+            Vector2 newPos = cell.cellPos;
+            for (int i = 1; i <= radius; i++)
             {
-                Vector2 _cellPos = cell.cellPos;
-                Vector2 newPos = _cellPos + convertDirectionToVector2[direction];
-                
-                if (pieceColor == Colours.ColourValue(Colours.ColourNames.LightBlue))
+                if (pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
                 {
-                    newPos *= -1;
+                    newPos -= convertDirectionToVector2[direction];
                 }
-                
-                Cell availableCell = cell.board.cellGrid[(int)newPos.x,(int)newPos.y];
-                availableCell.SetOutline(true);
-                //availableCells.Add(availableCell);
+                else
+                {
+                    newPos += convertDirectionToVector2[direction];
+                }
+
+                if (newPos.x < 8 && newPos.y < 8 &&
+                newPos.x >= 0 && newPos.y >= 0)
+                {
+                    Cell availableCell = cell.board.cellGrid[Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)];
+                    if (availableCell.CheckIfValid(pieceColor))
+                    {
+                        availableCell.SetOutline(true);
+                        availableCells.Add(availableCell);
+                    }
+                    availableCells.Add(cell);
+                }
             }
         }
     }
 
+    void Place()
+    {
+        Vector2Int cellBelowPos = Vector2Int.zero;
+
+        foreach (var availableCell in availableCells)
+        {
+            if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform,Input.mousePosition))
+            {
+                cellBelowPos = availableCell.cellPos;
+            }
+        }
+        Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
+        cell.RemovePiece();
+        cell = cellBelow;
+        cell.SetPiece(this);
+        transform.position = cell.GetWorldPos();
+    }
+    
     void ClearCells()
     {
         foreach (var cell in availableCells)
-        {
             cell.SetOutline(false);
-            //availableCells.Remove(cell);
-        }
+        availableCells.Clear();
     }
 
     public Sprite PieceSprite
@@ -92,6 +120,8 @@ public abstract class Piece : EventTrigger
             ChangeSprite();
         }
     }
+
+    public Color32 PieceColor => pieceColor;
 
     protected void ChangeSprite()
     {
@@ -115,7 +145,8 @@ public abstract class Piece : EventTrigger
     public override void OnEndDrag(PointerEventData eventData)
     {
         base.OnEndDrag(eventData);
-        //ClearCells();
         outline.SetActive(false);
+        Place();
+        ClearCells();
     }
 }
