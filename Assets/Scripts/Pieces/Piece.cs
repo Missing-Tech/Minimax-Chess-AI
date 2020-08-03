@@ -171,6 +171,8 @@ public abstract class Piece : EventTrigger
         cell = cellBelow;
         cell.SetPiece(this);
         transform.position = cell.GetWorldPos();
+
+        GameManager.Instance.isWhiteTurn = !GameManager.Instance.isWhiteTurn;
         
         FindValidMoves();
     }
@@ -213,23 +215,35 @@ public abstract class Piece : EventTrigger
 
     public override void OnBeginDrag(PointerEventData eventData)
     {
-        base.OnBeginDrag(eventData);
-        FindValidMoves();
-        outline.SetActive(true);
+        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
+            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        {
+            base.OnBeginDrag(eventData);
+            FindValidMoves();
+            outline.SetActive(true);
+        }
     }
 
     public override void OnDrag(PointerEventData eventData)
     {
-        base.OnDrag(eventData);
-        transform.position = eventData.position;
+        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
+            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        {
+            base.OnDrag(eventData);
+            transform.position = eventData.position;
+        }
     }
 
     public override void OnEndDrag(PointerEventData eventData)
     {
-        base.OnEndDrag(eventData);
-        outline.SetActive(false);
-        Place();
-        ClearCells();
+        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
+            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        {
+            base.OnEndDrag(eventData);
+            outline.SetActive(false);
+            Place();
+            ClearCells();
+        }
     }
 
     #endregion

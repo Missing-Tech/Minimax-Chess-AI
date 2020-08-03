@@ -23,12 +23,11 @@ public class Pawn : Piece
     public override void FindValidMoves()
     {
         base.FindValidMoves();
-
+        Vector2 newPos = cell.cellPos;
         //Checks the diagonals for an enemy piece (Bulky)
         Directions[] diagonals = new[] {Directions.NorthEast, Directions.NorthWest};
         foreach (var direction in diagonals)
         {
-            Vector2 newPos = cell.cellPos;
             //Flips the vector if the player is on the black side
             if (pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
             {
@@ -56,6 +55,15 @@ public class Pawn : Piece
                     //Stores all possible cells
                     availableCells.Add(availableCell);
                 }
+            }
+        }
+
+        for (int i = 0; i < availableCells.Count; i++)
+        {
+            if (availableCells[i].cellPos == (cell.cellPos + Vector2Int.up) 
+                && availableCells[i].CheckIfOtherTeam(pieceColor))
+            {
+                availableCells.Remove(availableCells[i]);
             }
         }
     }
