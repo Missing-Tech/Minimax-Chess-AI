@@ -48,6 +48,9 @@ public class Pawn : Piece
                 //Checks if the piece is on the other team
                 if (availableCell.CheckIfOtherTeam(pieceColor))
                 {
+                    //Marks the piece as threatened by another if one of the possible moves of this piece is on it
+                    availableCell.currentPiece.isThreatened = true;
+                    piecesThreatened.Add(availableCell.currentPiece);
                     //Outlines the possible moves
                     availableCell.SetOutline(true);
                     //Stores all possible cells

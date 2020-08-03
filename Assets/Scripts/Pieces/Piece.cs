@@ -12,7 +12,9 @@ public abstract class Piece : EventTrigger
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    
+    public bool isThreatened;
+    protected List<Piece> piecesThreatened = new List<Piece>();
+
     //Stores all possible directions in plaintext
     protected enum Directions
     {
@@ -25,6 +27,7 @@ public abstract class Piece : EventTrigger
         SouthWest,
         West,
         NorthWest,
+
         //Knight movement (clockwise)
         NorthEastL,
         EastNorthL,
@@ -41,44 +44,45 @@ public abstract class Piece : EventTrigger
     {
         //Cardinal direction movement (clockwise)
         {Directions.North, Vector2.up},
-        {Directions.NorthEast, new Vector2(1,1)},
+        {Directions.NorthEast, new Vector2(1, 1)},
         {Directions.East, Vector2.right},
-        {Directions.SouthEast, new Vector2(1,-1)},
+        {Directions.SouthEast, new Vector2(1, -1)},
         {Directions.South, Vector2.down},
-        {Directions.SouthWest, new Vector2(-1,-1)},
+        {Directions.SouthWest, new Vector2(-1, -1)},
         {Directions.West, Vector2.left},
-        {Directions.NorthWest, new Vector2(-1,1)},
+        {Directions.NorthWest, new Vector2(-1, 1)},
         //Knight movement (clockwise)
-        {Directions.NorthEastL, new Vector2(1,2)},
-        {Directions.EastNorthL, new Vector2(2,1)},
-        {Directions.EastSouthL, new Vector2(2,-1)},
-        {Directions.SouthEastL, new Vector2(1,-2)},
-        {Directions.SouthWestL, new Vector2(-1,-2)},
-        {Directions.WestSouthL, new Vector2(-2,-1)},
-        {Directions.WestNorthL, new Vector2(-2,1)},
-        {Directions.NorthWestL, new Vector2(-1,2)},
+        {Directions.NorthEastL, new Vector2(1, 2)},
+        {Directions.EastNorthL, new Vector2(2, 1)},
+        {Directions.EastSouthL, new Vector2(2, -1)},
+        {Directions.SouthEastL, new Vector2(1, -2)},
+        {Directions.SouthWestL, new Vector2(-1, -2)},
+        {Directions.WestSouthL, new Vector2(-2, -1)},
+        {Directions.WestNorthL, new Vector2(-2, 1)},
+        {Directions.NorthWestL, new Vector2(-1, 2)},
     };
-    
+
     //The radius of possible moves, e.g. a king has a radius of 1 but a queen has a radius of 8
     protected int radius = 1;
 
     //Stores all possible directions a piece can move
     protected Directions[] availableDirections;
+
     //Stores the possible moves from the current position
     public List<Cell> availableCells = new List<Cell>();
-    
+
     //Constructor to initialise the variables
     public virtual void Init(Cell cell, Color32 pieceColour)
     {
         //Populates the possible directions array
         SetDirections();
-        
+
         //Stores the outline and disables it
         outline = transform.GetChild(0).gameObject;
         outline.SetActive(false);
-        
+
         this.cell = cell;
-        
+
         //Gives the piece a sprite and colour
         Image pieceImage = GetComponent<Image>();
         pieceSprite = pieceImage.sprite;
@@ -90,9 +94,11 @@ public abstract class Piece : EventTrigger
     {
         //SetDirections
     }
-    
+
     public virtual void FindValidMoves()
     {
+        ClearThreatenedPieces();
+        
         //Loops through all possible directions a piece can move
         foreach (var direction in availableDirections)
         {
@@ -111,22 +117,31 @@ public abstract class Piece : EventTrigger
 
                 //Checks if the move is on the board
                 if (newPos.x < 8 && newPos.y < 8 &&
-                newPos.x >= 0 && newPos.y >= 0)
+                    newPos.x >= 0 && newPos.y >= 0)
                 {
                     //Stores the cell
                     Cell availableCell = cell.board.cellGrid[Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)];
                     //Checks if the piece is on the other team
-                    if (availableCell.CheckIfValid(pieceColor)) 
+                    if (availableCell.CheckIfValid(pieceColor))
                     {
                         //Outlines the possible moves
                         availableCell.SetOutline(true);
                         //Stores all possible cells
                         availableCells.Add(availableCell);
                     }
-                    if (availableCell.CheckForAnyPiece() && !canJumpOverPieces)
+
+                    if (availableCell.CheckForAnyPiece())
                     {
-                        break;
+                        //Marks the piece as threatened by another if one of the possible moves of this piece is on it
+                        if (availableCell.CheckIfOtherTeam(pieceColor))
+                        {
+                            availableCell.currentPiece.isThreatened = true;
+                            piecesThreatened.Add(availableCell.currentPiece);
+                        }
+                        if (!canJumpOverPieces)
+                            break;
                     }
+
                     //Add the current cell the piece is on so you can put the piece back down
                     availableCells.Add(cell);
                 }
@@ -143,18 +158,29 @@ public abstract class Piece : EventTrigger
         foreach (var availableCell in availableCells)
         {
             //If the mouse is on top of one of the cells
-            if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform,Input.mousePosition))
+            if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform, Input.mousePosition))
             {
                 //Set the local variable to the cell the mouse is on
                 cellBelowPos = availableCell.cellPos;
             }
         }
+
         //Moves the piece to the selected cell
         Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
         cell.RemovePiece();
         cell = cellBelow;
         cell.SetPiece(this);
         transform.position = cell.GetWorldPos();
+        
+        FindValidMoves();
+    }
+
+    void ClearThreatenedPieces()
+    {
+        foreach (var piece in piecesThreatened)
+        {
+            piece.isThreatened = false;
+        }
     }
     
     void ClearCells()
@@ -184,6 +210,7 @@ public abstract class Piece : EventTrigger
     }
 
     #region Events
+
     public override void OnBeginDrag(PointerEventData eventData)
     {
         base.OnBeginDrag(eventData);
@@ -206,5 +233,4 @@ public abstract class Piece : EventTrigger
     }
 
     #endregion
-    
 }
