@@ -56,6 +56,8 @@ MonoBehaviour:
   cellImage: {fileID: 363753321645117465}
   board: {fileID: 0}
   cellPos: {x: 0, y: 0}
+  rectTransform: {fileID: 0}
+  currentPiece: {fileID: 0}
 --- !u!222 &7917257692489860320
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -189,7 +191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3647059, g: 0.32156864, b: 0.3764706, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:

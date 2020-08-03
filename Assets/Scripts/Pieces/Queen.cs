@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class Queen : Piece
 {
-    // Start is called before the first frame update
-    void Start()
+    protected override void SetDirections()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        base.SetDirections();
+        radius = 8;
+        availableDirections = new Directions[]
+        {   
+            Directions.North, 
+            Directions.NorthEast, 
+            Directions.East,
+            Directions.SouthEast,
+            Directions.South,
+            Directions.SouthWest,
+            Directions.West,
+            Directions.NorthWest
+        };
     }
 }

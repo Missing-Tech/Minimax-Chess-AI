@@ -58,6 +58,25 @@ public class Cell : MonoBehaviour
       }
       return true;
    }
+
+   public bool CheckForAnyPiece()
+   {
+      if (currentPiece != null)
+      {
+         return true;
+      }
+
+      return false;
+   }
+   
+   public bool CheckIfOtherTeam(Color32 pieceColour)
+   {
+      if (currentPiece == null || currentPiece.PieceColor.Equals(pieceColour))
+      {
+         return false;
+      }
+      return true;
+   }
    
    public Vector2 GetWorldPos()
    {
