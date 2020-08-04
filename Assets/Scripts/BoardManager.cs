@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.UI;
 using UnityEngine;
 using static Colours.ColourNames;
@@ -67,6 +68,20 @@ public class BoardManager : MonoBehaviour
                 blackPieces.Add(spawnedPiece.GetComponent<Piece>());
                 pieceComponent.Init(spawnedPieceCell,Colours.ColourValue(Black));
             }
+        }
+    }
+
+    public void ResetBoard()
+    {
+        GameManager.Instance.Reset();
+        var allPieces = whitePieces.Concat(blackPieces);
+        foreach (var piece in allPieces)
+        {
+            piece.cell.RemovePiece();
+            piece.cell = piece.originalCell;
+            piece.gameObject.SetActive(true);
+            piece.originalCell.SetPiece(piece);
+            piece.transform.position = piece.cell.GetWorldPos();
         }
     }
 }

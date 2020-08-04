@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +10,9 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get { return _instance; } }
 
-
+    public TextMeshProUGUI winText;
+    private bool gameWon;
+    
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -29,4 +33,28 @@ public class GameManager : MonoBehaviour
         board.InitBoard();
     }
 
+    private void Update()
+    {
+        if (gameWon)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                FindObjectOfType<BoardManager>().ResetBoard();
+            }
+        }
+    }
+
+    public void Win(bool isWhite)
+    {
+        winText.gameObject.SetActive(true);
+        winText.text = isWhite ? "BLACK WINS" : "WHITE WINS";
+        gameWon = true;
+    }
+
+    public void Reset()
+    {
+        winText.gameObject.SetActive(false);
+        gameWon = false;
+    }
+    
 }
