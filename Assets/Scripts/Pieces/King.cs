@@ -21,22 +21,16 @@ public class King : Piece
             Directions.NorthWest
         };
     }
-
+    
     protected override void BeingThreatened()
     {
         base.BeingThreatened();
         CheckForNearbyMoves();
-        if (availableCells.Count == 0)
+        if (availableCells.Count <= 1)
         {
             bool isWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White));
             GameManager.Instance.Win(isWhite);
         }
-    }
-
-    public override void FindValidMoves()
-    {
-        base.FindValidMoves();
-        BeingThreatened();
     }
 
     private void OnDisable()
@@ -47,18 +41,19 @@ public class King : Piece
 
     void CheckForNearbyMoves()
     {
+        //pieceThreatening.FindValidMoves(false);
         foreach (var direction in availableDirections)
         {
-            Vector2 posToCheck = cell.cellPos + convertDirectionToVector2[direction];
-            if (posToCheck.x < 8 && posToCheck.y < 8 &&
-                posToCheck.x >= 0 && posToCheck.y >= 0)
+            Vector2 cellPos = cell.cellPos + convertDirectionToVector2[direction];
+            if (IsInRange(cellPos))
             {
-                Cell cellToCheck = cell.board.cellGrid[(int) posToCheck.x, (int) posToCheck.y];
+                Cell cellToCheck = cell.board.cellGrid[(int) cellPos.x, (int) cellPos.y];
                 if (!cellToCheck.CheckForAnyPiece())
                 {
                     availableCells.Add(cellToCheck);
                 }
             }
         }
+        //pieceThreatening.ClearCells();
     }
 }

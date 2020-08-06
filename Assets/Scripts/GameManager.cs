@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI winText;
     private bool gameWon;
+    private BoardManager bm;
     
     private void Awake()
     {
@@ -21,11 +22,23 @@ public class GameManager : MonoBehaviour
         } else {
             _instance = this;
         }
+
+        bm = FindObjectOfType<BoardManager>();
     }
 
     public Board board;
 
-    public bool isWhiteTurn = true;
+    public bool IsWhiteTurn
+    {
+        get => isWhiteTurn;
+        set
+        {
+            isWhiteTurn = value;
+            bm.EndTurn();
+        }
+    }
+
+    private bool isWhiteTurn = true;
     
     // Start is called before the first frame update
     void Start()
@@ -39,7 +52,7 @@ public class GameManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                FindObjectOfType<BoardManager>().ResetBoard();
+                bm.ResetBoard();
             }
         }
     }
