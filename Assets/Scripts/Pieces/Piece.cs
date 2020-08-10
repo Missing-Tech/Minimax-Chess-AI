@@ -16,7 +16,7 @@ public abstract class Piece : EventTrigger
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
     private bool isThreatened;
-    //public Piece pieceThreatening;
+    public GameObject pieceThreatening;
 
     protected List<Piece> piecesThreatened = new List<Piece>();
     
@@ -110,7 +110,6 @@ public abstract class Piece : EventTrigger
 
     public virtual void FindValidMoves(bool highlightCells)
     {
-        //ClearCells();
         //Loops through all possible directions a piece can move
         foreach (var direction in availableDirections)
         {
@@ -149,9 +148,12 @@ public abstract class Piece : EventTrigger
                         //Marks the piece as threatened by another if one of the possible moves of this piece is on it
                         if (availableCell.CheckIfOtherTeam(pieceColor))
                         {
-                            availableCell.currentPiece.IsThreatened = true;
-                            //availableCell.currentPiece.pieceThreatening = this;
+                            availableCell.currentPiece.pieceThreatening = gameObject;
                             piecesThreatened.Add(availableCell.currentPiece);
+                            if (!availableCell.currentPiece.IsThreatened)
+                            {
+                                availableCell.currentPiece.IsThreatened = true;
+                            }
                         }
                         if (!canJumpOverPieces)
                             break;
@@ -190,7 +192,7 @@ public abstract class Piece : EventTrigger
         if (cell != cellLastTurn)
         {
             EndTurn();
-            //ClearThreatenedPieces();
+            FindValidMoves(false);
         }
     }
 
