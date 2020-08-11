@@ -14,10 +14,13 @@ public class BoardManager : MonoBehaviour
     public List<Piece> whitePieces;
     public List<Piece> blackPieces;
 
+    public MinimaxAI ai;
+
     [Tooltip("0 = Rook, 1 = Knight, 2 = Bishop, 3 = Queen, 4 = King, 5 = Pawn")]
     public Sprite[] pieceSprites;
 
     private int[] royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
+    
 
     private Dictionary<int, Type> pieceConverter = new Dictionary<int, Type>()
     {
@@ -28,6 +31,16 @@ public class BoardManager : MonoBehaviour
         {4, typeof(King)},
     };
 
+    public Dictionary<Type, int> pieceEvaluation = new Dictionary<Type, int>() //Standard chess piece values
+    {
+        {typeof(Pawn),1},
+        {typeof(Rook),5},
+        {typeof(Knight),3},
+        {typeof(Bishop),3},
+        {typeof(Queen),9},
+        {typeof(King),1000},
+    };
+    
     public void SpawnPieces()
     {
         //white pieces
@@ -73,13 +86,27 @@ public class BoardManager : MonoBehaviour
 
     public void EndTurn()
     {
-        /*var allPieces = whitePieces.Concat(blackPieces);
-        foreach (var piece in allPieces)
+        if (!GameManager.Instance.IsWhiteTurn)
         {
-            piece.FindValidMoves(false);
-        }*/
+            ai.DoTurn();
+        }
     }
 
+    public int StaticEvaluation()
+    {
+        int score = 0;
+        //Return the difference between value of white pieces vs black pieces
+        foreach (var piece in whitePieces)
+        {
+            score += pieceEvaluation[piece.GetType()];
+        }
+        foreach (var piece in blackPieces)
+        {
+            score -= pieceEvaluation[piece.GetType()];
+        }
+        return score;
+    }
+    
     public void ResetBoard()
     {
         GameManager.Instance.Reset();

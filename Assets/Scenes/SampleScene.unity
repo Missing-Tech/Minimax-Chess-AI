@@ -178,6 +178,7 @@ MonoBehaviour:
   pieceObject: {fileID: 2282514518508822482, guid: 4623d56015b864f459ee7d70393f55c8, type: 3}
   whitePieces: []
   blackPieces: []
+  ai: {fileID: 190601557}
   pieceSprites:
   - {fileID: 585941068332114143, guid: 26316508212e8a740be4eb4f997c536c, type: 3}
   - {fileID: 1062394764209686007, guid: 26316508212e8a740be4eb4f997c536c, type: 3}
@@ -231,6 +232,49 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &190601556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 190601558}
+  - component: {fileID: 190601557}
+  m_Layer: 0
+  m_Name: Minimax AI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &190601557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190601556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b040fd4aecac684f99133c795467075, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &190601558
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190601556}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 386.13217, y: 200.77357, z: 25.009506}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,8 +376,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winText: {fileID: 1172562603}
+  gameWon: 0
   board: {fileID: 8627845436735900010}
-  isWhiteTurn: 1
 --- !u!1 &843080804
 GameObject:
   m_ObjectHideFlags: 0

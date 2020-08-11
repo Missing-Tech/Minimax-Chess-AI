@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
     public TextMeshProUGUI winText;
-    private bool gameWon;
+    public bool gameWon;
     private BoardManager bm;
     
     private void Awake()

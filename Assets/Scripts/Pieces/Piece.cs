@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static Colours;
 
 //Defines the base class for all pieces - inheriting from event trigger
 public abstract class Piece : EventTrigger
@@ -117,7 +118,7 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
                 {
                     newPos -= convertDirectionToVector2[direction];
                 }
@@ -166,26 +167,10 @@ public abstract class Piece : EventTrigger
         }
     }
 
-    protected virtual void Place()
+    public void Place(Cell cellToMoveTo)
     {
-        //Stores the cellPos locally
-        Vector2Int cellBelowPos = cell.cellPos;
-
-        //Go through all possible moves for the piece
-        foreach (var availableCell in availableCells)
-        {
-            //If the mouse is on top of one of the cells
-            if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform, Input.mousePosition))
-            {
-                //Set the local variable to the cell the mouse is on
-                cellBelowPos = availableCell.cellPos;
-            }
-        }
-
-        //Moves the piece to the selected cell
-        Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
         cell.RemovePiece();
-        cell = cellBelow;
+        cell = cellToMoveTo;
         cell.SetPiece(this);
         transform.position = cell.GetWorldPos();
 
@@ -256,8 +241,9 @@ public abstract class Piece : EventTrigger
 
     protected bool IsTeamTurn()
     {
-        if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
-            !GameManager.Instance.IsWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        /*if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)) || 
+            !GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.Black)))*/
+        if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)))
         {
             return true;
         }
@@ -299,7 +285,24 @@ public abstract class Piece : EventTrigger
         {
             base.OnEndDrag(eventData);
             outline.SetActive(false);
-            Place();
+            
+            //Stores the cellPos locally
+            Vector2Int cellBelowPos = cell.cellPos;
+
+            //Go through all possible moves for the piece
+            foreach (var availableCell in availableCells)
+            {
+                //If the mouse is on top of one of the cells
+                if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform, Input.mousePosition))
+                {
+                    //Set the local variable to the cell the mouse is on
+                    cellBelowPos = availableCell.cellPos;
+                }
+            }
+            //Moves the piece to the selected cell
+            Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
+            
+            Place(cellBelow);
             ClearCells();
         }
     }

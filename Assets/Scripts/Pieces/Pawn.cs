@@ -18,11 +18,6 @@ public class Pawn : Piece
         };
     }
 
-    protected override void Place()
-    {
-        base.Place();
-    }
-
     protected override void EndTurn()
     {
         base.EndTurn();
