@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static Colours;
 
 //Defines the base class for all pieces - inheriting from event trigger
 public abstract class Piece : EventTrigger
 {
+    public Cell originalCell;
+    protected Cell cellLastTurn;
+    public Cell cell;
+    
     protected Sprite pieceSprite;
-    protected Cell cell;
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    public bool isThreatened;
+    private bool isThreatened;
+    public GameObject pieceThreatening;
+
     protected List<Piece> piecesThreatened = new List<Piece>();
+    
 
     //Stores all possible directions in plaintext
     protected enum Directions
@@ -82,7 +89,9 @@ public abstract class Piece : EventTrigger
         outline.SetActive(false);
 
         this.cell = cell;
-
+        cellLastTurn = cell;
+        originalCell = cell;
+        
         //Gives the piece a sprite and colour
         Image pieceImage = GetComponent<Image>();
         pieceSprite = pieceImage.sprite;
@@ -92,13 +101,16 @@ public abstract class Piece : EventTrigger
 
     protected virtual void SetDirections()
     {
-        //SetDirections
+        //SetDirections - Handled by the piece
     }
 
-    public virtual void FindValidMoves()
+    protected virtual void BeingThreatened()
     {
-        ClearThreatenedPieces();
-        
+        //Threatened - Handled by the piece
+    }
+
+    public virtual void FindValidMoves(bool highlightCells)
+    {
         //Loops through all possible directions a piece can move
         foreach (var direction in availableDirections)
         {
@@ -106,7 +118,7 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
                 {
                     newPos -= convertDirectionToVector2[direction];
                 }
@@ -116,16 +128,18 @@ public abstract class Piece : EventTrigger
                 }
 
                 //Checks if the move is on the board
-                if (newPos.x < 8 && newPos.y < 8 &&
-                    newPos.x >= 0 && newPos.y >= 0)
+                if (IsInRange(newPos))
                 {
                     //Stores the cell
-                    Cell availableCell = cell.board.cellGrid[Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)];
+                    Cell availableCell = cell.board.cellGrid[(int)newPos.x, (int)newPos.y];
                     //Checks if the piece is on the other team
                     if (availableCell.CheckIfValid(pieceColor))
                     {
-                        //Outlines the possible moves
-                        availableCell.SetOutline(true);
+                        if (highlightCells)
+                        {
+                            //Outlines the possible moves
+                            availableCell.SetOutline(true);
+                        }
                         //Stores all possible cells
                         availableCells.Add(availableCell);
                     }
@@ -135,8 +149,12 @@ public abstract class Piece : EventTrigger
                         //Marks the piece as threatened by another if one of the possible moves of this piece is on it
                         if (availableCell.CheckIfOtherTeam(pieceColor))
                         {
-                            availableCell.currentPiece.isThreatened = true;
+                            availableCell.currentPiece.pieceThreatening = gameObject;
                             piecesThreatened.Add(availableCell.currentPiece);
+                            if (!availableCell.currentPiece.IsThreatened)
+                            {
+                                availableCell.currentPiece.IsThreatened = true;
+                            }
                         }
                         if (!canJumpOverPieces)
                             break;
@@ -149,43 +167,38 @@ public abstract class Piece : EventTrigger
         }
     }
 
-    protected virtual void Place()
+    public void Place(Cell cellToMoveTo)
     {
-        //Stores the cellPos locally
-        Vector2Int cellBelowPos = cell.cellPos;
-
-        //Go through all possible moves for the piece
-        foreach (var availableCell in availableCells)
-        {
-            //If the mouse is on top of one of the cells
-            if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform, Input.mousePosition))
-            {
-                //Set the local variable to the cell the mouse is on
-                cellBelowPos = availableCell.cellPos;
-            }
-        }
-
-        //Moves the piece to the selected cell
-        Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
         cell.RemovePiece();
-        cell = cellBelow;
+        cell = cellToMoveTo;
         cell.SetPiece(this);
         transform.position = cell.GetWorldPos();
 
-        GameManager.Instance.isWhiteTurn = !GameManager.Instance.isWhiteTurn;
-        
-        FindValidMoves();
+        if (cell != cellLastTurn)
+        {
+            EndTurn();
+            FindValidMoves(false);
+        }
+    }
+
+    protected virtual void EndTurn()
+    {
+        GameManager.Instance.IsWhiteTurn = !GameManager.Instance.IsWhiteTurn;
+        cellLastTurn = cell;
     }
 
     void ClearThreatenedPieces()
     {
+        //Clears all threatened pieces
         foreach (var piece in piecesThreatened)
         {
-            piece.isThreatened = false;
+            piece.IsThreatened = false;
+            //piece.pieceThreatening = null;
         }
+        piecesThreatened.Clear();
     }
     
-    void ClearCells()
+    public void ClearCells()
     {
         //Clears all highlighted cells
         foreach (var cell in availableCells)
@@ -204,6 +217,19 @@ public abstract class Piece : EventTrigger
         }
     }
 
+    public bool IsThreatened
+    {
+        get => isThreatened;
+        set
+        {
+            isThreatened = value;
+            if (isThreatened)
+            {
+                BeingThreatened();
+            }
+        }
+    }
+    
     public Color32 PieceColor => pieceColor;
 
     protected void ChangeSprite()
@@ -211,23 +237,47 @@ public abstract class Piece : EventTrigger
         GetComponent<Image>().sprite = pieceSprite;
     }
 
+    public virtual bool CanTakePiece(Cell cell)
+    {
+        return true;
+    }
+    
     #region Events
 
+    protected bool IsTeamTurn()
+    {
+        /*if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)) || 
+            !GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.Black)))*/
+        if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    protected bool IsInRange(Vector2 pos)
+    {
+        if (pos.x < 8 && pos.y < 8 &&
+            pos.x >= 0 && pos.y >= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    
     public override void OnBeginDrag(PointerEventData eventData)
     {
-        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
-            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        if(IsTeamTurn())
         {
             base.OnBeginDrag(eventData);
-            FindValidMoves();
+            FindValidMoves(true);
             outline.SetActive(true);
         }
     }
 
     public override void OnDrag(PointerEventData eventData)
     {
-        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
-            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        if (IsTeamTurn())
         {
             base.OnDrag(eventData);
             transform.position = eventData.position;
@@ -236,12 +286,28 @@ public abstract class Piece : EventTrigger
 
     public override void OnEndDrag(PointerEventData eventData)
     {
-        if (!GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) || 
-            GameManager.Instance.isWhiteTurn && pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
+        if (IsTeamTurn())
         {
             base.OnEndDrag(eventData);
             outline.SetActive(false);
-            Place();
+            
+            //Stores the cellPos locally
+            Vector2Int cellBelowPos = cell.cellPos;
+
+            //Go through all possible moves for the piece
+            foreach (var availableCell in availableCells)
+            {
+                //If the mouse is on top of one of the cells
+                if (RectTransformUtility.RectangleContainsScreenPoint(availableCell.rectTransform, Input.mousePosition))
+                {
+                    //Set the local variable to the cell the mouse is on
+                    cellBelowPos = availableCell.cellPos;
+                }
+            }
+            //Moves the piece to the selected cell
+            Cell cellBelow = cell.board.cellGrid[cellBelowPos.x, cellBelowPos.y];
+            
+            Place(cellBelow);
             ClearCells();
         }
     }

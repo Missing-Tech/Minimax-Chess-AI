@@ -1,69 +1,88 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Pawn : Piece
 {
+    private bool isFirstMove;
+    
+    
     protected override void SetDirections()
     {
+        isFirstMove = true;
+        
         base.SetDirections();
-        radius = 2;
         availableDirections = new Directions[]
         {
             Directions.North,
         };
     }
 
-    protected override void Place()
+    protected override void EndTurn()
     {
-        base.Place();
-        radius = 1;
+        base.EndTurn();
+        isFirstMove = false;
     }
 
-    public override void FindValidMoves()
+    public override void FindValidMoves(bool highlightCells)
     {
-        base.FindValidMoves();
-        Vector2 newPos = cell.cellPos;
-        //Checks the diagonals for an enemy piece (Bulky)
-        Directions[] diagonals = new[] {Directions.NorthEast, Directions.NorthWest};
-        foreach (var direction in diagonals)
-        {
-            //Flips the vector if the player is on the black side
-            if (pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)))
-            {
-                newPos -= convertDirectionToVector2[direction];
-            }
-            else
-            {
-                newPos += convertDirectionToVector2[direction];
-            }
+        int teamMultiplier;
+        teamMultiplier = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)) ? -1 : 1;
 
-            //Checks if the move is on the board
-            if (newPos.x < 8 && newPos.y < 8 &&
-                newPos.x >= 0 && newPos.y >= 0)
+        if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
+        {
+            if (isFirstMove)
             {
-                //Stores the cell
-                Cell availableCell = cell.board.cellGrid[Mathf.RoundToInt(newPos.x), Mathf.RoundToInt(newPos.y)];
-                //Checks if the piece is on the other team
-                if (availableCell.CheckIfOtherTeam(pieceColor))
-                {
-                    //Marks the piece as threatened by another if one of the possible moves of this piece is on it
-                    availableCell.currentPiece.isThreatened = true;
-                    piecesThreatened.Add(availableCell.currentPiece);
-                    //Outlines the possible moves
-                    availableCell.SetOutline(true);
-                    //Stores all possible cells
-                    availableCells.Add(availableCell);
-                }
+                AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
             }
+            AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier), highlightCells);
         }
 
-        for (int i = 0; i < availableCells.Count; i++)
+        CheckForEnemy(Directions.NorthEast, 1 * teamMultiplier, highlightCells);
+        CheckForEnemy(Directions.NorthWest, 1 * teamMultiplier, highlightCells);
+    }
+
+    //todo cleanup
+    
+    void AddAvailableCell(Vector2Int pos, bool highlightCells)
+    {
+        if (IsInRange(pos))
         {
-            if (availableCells[i].cellPos == (cell.cellPos + Vector2Int.up) 
-                && availableCells[i].CheckIfOtherTeam(pieceColor))
+            Cell newCell = cell.board.cellGrid[pos.x, pos.y];
+            availableCells.Add(newCell);
+            if (highlightCells)
             {
-                availableCells.Remove(availableCells[i]);
+                newCell.SetOutline(true);
+            }
+        }
+    }
+
+    public override bool CanTakePiece(Cell cell)
+    {
+        if (!isFirstMove)
+        {
+            if (availableCells.Contains(cell) && availableCells.IndexOf(cell) != 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void CheckForEnemy(Directions direction, int multiplier, bool highlightCells)
+    {
+        Vector2 checkPos = cell.cellPos + (convertDirectionToVector2[direction] * multiplier);
+        if (IsInRange(checkPos))
+        {
+            Cell checkCell = cell.board.cellGrid[(int) checkPos.x, (int) checkPos.y];
+            if (checkCell.CheckIfOtherTeam(pieceColor))
+            {
+                availableCells.Add(checkCell);
+                if (highlightCells)
+                {
+                    checkCell.SetOutline(true);
+                }
             }
         }
     }
