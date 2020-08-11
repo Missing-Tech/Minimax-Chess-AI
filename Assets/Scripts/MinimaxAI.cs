@@ -22,7 +22,8 @@ public class MinimaxAI : MonoBehaviour
     public void DoTurn()
     {
         _possibleMoves = FindPossibleMoves();
-        Move bestMove = _possibleMoves.OrderBy(x => x.Value).First().Key;
+        //Looks for move with lowest score
+        Move bestMove = _possibleMoves.OrderBy(x => x.Value).First().Key; 
         Piece pieceToMove = bestMove.piece;
         pieceToMove.Place(bestMove.move);
         ClearMoves();
@@ -42,15 +43,20 @@ public class MinimaxAI : MonoBehaviour
         Dictionary<Move,int> possibleMoves = new Dictionary<Move, int>();
         foreach (var piece in _bm.blackPieces)
         {
-            piece.FindValidMoves(false);
-            foreach (var cell in piece.availableCells)
+            if (piece.gameObject.activeSelf)
             {
-                int score = _bm.StaticEvaluation();
-                if (cell.CheckIfOtherTeam(Colours.ColourValue(Black)))
+                piece.FindValidMoves(false);
+                foreach (var cell in piece.availableCells)
                 {
-                    score -= _bm.pieceEvaluation[cell.currentPiece.GetType()];
+                    int score = _bm.StaticEvaluation();
+                    bool canTake = false;
+                    if (cell.CheckIfOtherTeam(Colours.ColourValue(Black)) && piece.CanTakePiece(cell))
+                    {
+                        //If you can take a piece with the move, adjust the score accordingly
+                        score -= _bm.pieceEvaluation[cell.currentPiece.GetType()];
+                    }
+                    possibleMoves.Add(new Move(piece,cell), score);
                 }
-                possibleMoves.Add(new Move(piece,cell), score);
             }
         }
         return possibleMoves;

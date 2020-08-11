@@ -237,6 +237,11 @@ public abstract class Piece : EventTrigger
         GetComponent<Image>().sprite = pieceSprite;
     }
 
+    public virtual bool CanTakePiece(Cell cell)
+    {
+        return true;
+    }
+    
     #region Events
 
     protected bool IsTeamTurn()

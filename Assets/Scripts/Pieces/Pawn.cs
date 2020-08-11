@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Pawn : Piece
@@ -56,7 +57,19 @@ public class Pawn : Piece
             }
         }
     }
-    
+
+    public override bool CanTakePiece(Cell cell)
+    {
+        if (!isFirstMove)
+        {
+            if (availableCells.Contains(cell) && availableCells.IndexOf(cell) != 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void CheckForEnemy(Directions direction, int multiplier, bool highlightCells)
     {
         Vector2 checkPos = cell.cellPos + (convertDirectionToVector2[direction] * multiplier);
