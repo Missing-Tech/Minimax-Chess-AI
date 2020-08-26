@@ -8,6 +8,10 @@ using static Colours.ColourNames;
 
 public class BoardManager : MonoBehaviour
 {
+    private static BoardManager _instance;
+
+    public static BoardManager Instance { get { return _instance; } }
+    
     public Board board;
     public GameObject pieceObject;
 
@@ -41,6 +45,16 @@ public class BoardManager : MonoBehaviour
         {typeof(King),1000},
     };
     
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        } else {
+            _instance = this;
+        }
+    }
+    
     public void SpawnPieces()
     {
         //white pieces
@@ -60,7 +74,7 @@ public class BoardManager : MonoBehaviour
             var spawnedPieceCell = board.cellGrid[x, cellColumn];
             GameObject spawnedPiece = Instantiate(pieceObject, spawnedPieceCell.transform);
             spawnedPiece.transform.position = spawnedPieceCell.GetWorldPos();
-            spawnedPiece.transform.parent = transform;
+            spawnedPiece.transform.SetParent(transform);
 
             //Checks what piece type it should be
             var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[royalRow[x]];
@@ -90,21 +104,6 @@ public class BoardManager : MonoBehaviour
         {
             ai.DoTurn();
         }
-    }
-
-    public int StaticEvaluation()
-    {
-        int score = 0;
-        //Return the difference between value of white pieces vs black pieces
-        foreach (var piece in whitePieces)
-        {
-            score += pieceEvaluation[piece.GetType()];
-        }
-        foreach (var piece in blackPieces)
-        {
-            score -= pieceEvaluation[piece.GetType()];
-        }
-        return score;
     }
     
     public void ResetBoard()

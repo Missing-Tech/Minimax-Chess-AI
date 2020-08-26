@@ -6,6 +6,8 @@ using UnityEngine;
 public class Colours
 {
 
+    //Stores references to Color32 values to be used elsewhere
+
     public enum ColourNames
     {
         PaleOrange,

@@ -1,15 +1,29 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Colours.ColourNames;
 
 public class Board : MonoBehaviour
 {
+    private static Board _instance;
 
+    public static Board Instance { get { return _instance; } }
+    
     public GameObject cellPrefab;
     
     public Cell[,] cellGrid = new Cell[8,8];
-    
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        } else {
+            _instance = this;
+        }
+    }
+
     public void InitBoard()
     {
         //Makes the grid visible to the player
@@ -26,7 +40,7 @@ public class Board : MonoBehaviour
                 cellGrid[x,y].Init(this, new Vector2Int(x,y));
             }
         }
-        
+
         ColourBoard();
     }
 

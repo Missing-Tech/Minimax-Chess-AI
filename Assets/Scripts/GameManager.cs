@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI winText;
     public bool gameWon;
     private BoardManager bm;
+    private bool isWhiteTurn = true;
     
     private void Awake()
     {
@@ -38,9 +39,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private bool isWhiteTurn = true;
-    
-    // Start is called before the first frame update
     void Start()
     {
         board.InitBoard();
