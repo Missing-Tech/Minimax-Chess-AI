@@ -13,6 +13,8 @@ public class BoardPosition
     public List<BoardPosition> nextMoves;
     public int staticEvaluation;
     public BoardManager bm;
+    public Cell pieceCurrentCell;
+    public Cell futureCell;
     private bool nextMovesCalculated = false;
 
     public List<BoardPosition> NextMoves
@@ -51,9 +53,9 @@ public class BoardPosition
         
         /*Manually change piece variable (because it's a hypothetical cell position and
         the piece's shouldn't move on the game screen)*/
-        Cell pieceCurrentCell = cellGrid[piece.cell.cellPos.x, piece.cell.cellPos.y];
+        pieceCurrentCell = cellGrid[piece.cell.cellPos.x, piece.cell.cellPos.y];
         pieceCurrentCell.currentPiece = null;
-        Cell futureCell = cellGrid[cellToMoveTo.cellPos.x, cellToMoveTo.cellPos.y];
+        futureCell = cellGrid[cellToMoveTo.cellPos.x, cellToMoveTo.cellPos.y];
         futureCell.currentPiece = piece;
     }
 
