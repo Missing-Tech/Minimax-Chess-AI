@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using TMPro.EditorUtilities;
 using UnityEngine;
@@ -8,48 +9,32 @@ using UnityEngine;
 //Custom class to store a possible move and the piece it's derived from
 public class BoardPosition
 {
-    public Cell[,] cellGrid = new Cell[8,8];
+    public Cell[,] cellGrid;
     public bool isWhiteMove;
     public List<BoardPosition> nextMoves;
+    public bool finishedCalculating;
     public int staticEvaluation;
     public BoardManager bm;
     public Cell pieceCurrentCell;
     public Cell futureCell;
-    private bool nextMovesCalculated = false;
-
-    public List<BoardPosition> NextMoves
-    {
-        get
-        {
-            if (nextMovesCalculated)
-            {
-                return nextMoves;
-            }
-            nextMoves = CalculateNextMoves();
-            nextMovesCalculated = true;
-            return nextMoves;
-        }
-    }
-
-    public int StaticEvaluation
-    {
-        get
-        {
-            staticEvaluation = CalculateScore();
-            return staticEvaluation;
-        }
-    }
 
     public bool isGameOver = false;
 
     //Constructor for future positions
-    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver)
+    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver, int depth)
     {
         cellGrid = Board.Instance.cellGrid;
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
         this.isGameOver = isGameOver;
-        
         bm = BoardManager.Instance;
+        
+        if (depth > 0)
+        {
+            nextMoves = CalculateNextMoves(depth);
+            staticEvaluation = CalculateScore();
+        }
+        
+        
         
         /*Manually change piece variable (because it's a hypothetical cell position and
         the piece's shouldn't move on the game screen)*/
@@ -60,16 +45,21 @@ public class BoardPosition
     }
 
     //Constructor for current position
-    public BoardPosition()
+    public BoardPosition(int depth)
     {
         cellGrid = Board.Instance.cellGrid;
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
         isGameOver = GameManager.Instance.gameWon;
-        
         bm = BoardManager.Instance;
+        
+        if (depth > 0)
+        {
+            nextMoves = CalculateNextMoves(depth);
+            staticEvaluation = CalculateScore();
+        }
     }
 
-    private List<BoardPosition> CalculateNextMoves()
+    private List<BoardPosition> CalculateNextMoves(int depth)
     {
         List<BoardPosition> moves = new List<BoardPosition>();
 
@@ -80,11 +70,10 @@ public class BoardPosition
             if (piece != null)
             {
                 piece.FindValidMoves(false);
-                List<Cell> pieceMoves = piece.availableCells;
 
                 bool checkmate = false;
 
-                foreach (var move in pieceMoves)
+                foreach (var move in piece.)
                 {
                     if (move.currentPiece != null)
                     {
@@ -95,10 +84,11 @@ public class BoardPosition
                         }
                     }
 
-                    moves.Add(new BoardPosition(piece,move,checkmate));
+                    moves.Add(new BoardPosition(piece,move,checkmate,depth-1));
                 }
             }
         }
+        finishedCalculating = true;
         return moves;
     }
 
