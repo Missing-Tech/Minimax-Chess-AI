@@ -34,8 +34,6 @@ public class BoardPosition
             staticEvaluation = CalculateScore();
         }
         
-        
-        
         /*Manually change piece variable (because it's a hypothetical cell position and
         the piece's shouldn't move on the game screen)*/
         pieceCurrentCell = cellGrid[piece.cell.cellPos.x, piece.cell.cellPos.y];
@@ -71,9 +69,11 @@ public class BoardPosition
             {
                 piece.FindValidMoves(false);
 
+                var availableCells = piece.availableCells;
+                
                 bool checkmate = false;
 
-                foreach (var move in piece.)
+                foreach (var move in availableCells.ToArray())
                 {
                     if (move.currentPiece != null)
                     {
@@ -86,6 +86,7 @@ public class BoardPosition
 
                     moves.Add(new BoardPosition(piece,move,checkmate,depth-1));
                 }
+                piece.ClearCells();
             }
         }
         finishedCalculating = true;

@@ -12,7 +12,7 @@ public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm;
     private BoardPosition _bestPossibleMove;
-    private int searchDepth = 2;
+    private int searchDepth = 3;
 
     private void Start()
     {
@@ -30,9 +30,8 @@ public class MinimaxAI : MonoBehaviour
         float test = Minimax(searchDepth, currentBoardPosition, false, -Mathf.Infinity,Mathf.Infinity);
         Debug.Log(test);
         
-        //Piece pieceToMove = _bestPossibleMove.pieceCurrentCell.currentPiece;
-        //_bm.blackPieces.Find(x => pieceToMove).Place(_bestPossibleMove.futureCell);
-        GameManager.Instance.IsWhiteTurn = true;
+        Piece pieceToMove = _bestPossibleMove.pieceCurrentCell.currentPiece;
+        _bm.blackPieces.Find(x => pieceToMove).Place(_bestPossibleMove.futureCell);
     }
 
     //White is maximising, black is minimising
