@@ -31,6 +31,15 @@ public class Cell : MonoBehaviour
       outline.SetActive(active);
    }
 
+   public void Refresh()
+   {
+      if (currentPiece != null)
+      {
+         currentPiece.transform.position = GetWorldPos();
+         currentPiece.transform.SetParent(transform);
+      }
+   }
+   
    public void SetPiece(Piece newPiece)
    {
       if (currentPiece != null && !currentPiece.PieceColor.Equals(newPiece.PieceColor))

@@ -118,14 +118,16 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
+                /*if (pieceColor.Equals(ColourValue(ColourNames.Black)))
                 {
                     newPos -= convertDirectionToVector2[direction];
                 }
                 else
                 {
                     newPos += convertDirectionToVector2[direction];
-                }
+                }*/
+                
+                newPos += convertDirectionToVector2[direction];
 
                 //Checks if the move is on the board
                 if (IsInRange(newPos))

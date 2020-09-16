@@ -105,7 +105,15 @@ public class BoardManager : MonoBehaviour
             ai.DoTurn();
         }
     }
-    
+
+    public void RefreshBoard()
+    {
+        foreach (var cell in board.cellGrid)
+        {
+            cell.Refresh();
+        }
+    }
+
     public void ResetBoard()
     {
         GameManager.Instance.Reset();

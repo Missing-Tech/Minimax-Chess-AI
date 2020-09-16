@@ -11,6 +11,7 @@ public class BoardPosition
 {
     public Cell[,] cellGrid;
     public bool isWhiteMove;
+    public BoardPosition firstBoardPos;
     public List<BoardPosition> nextMoves;
     public bool finishedCalculating;
     public int staticEvaluation;
@@ -21,7 +22,7 @@ public class BoardPosition
     public bool isGameOver = false;
 
     //Constructor for future positions
-    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver, int depth)
+    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver, int depth, BoardPosition previousBoardPos)
     {
         cellGrid = Board.Instance.cellGrid;
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
@@ -30,6 +31,7 @@ public class BoardPosition
         
         if (depth > 0)
         {
+            firstBoardPos = previousBoardPos;
             nextMoves = CalculateNextMoves(depth);
             staticEvaluation = CalculateScore();
         }
@@ -49,6 +51,7 @@ public class BoardPosition
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
         isGameOver = GameManager.Instance.gameWon;
         bm = BoardManager.Instance;
+        firstBoardPos = this;
         
         if (depth > 0)
         {
@@ -84,7 +87,7 @@ public class BoardPosition
                         }
                     }
 
-                    moves.Add(new BoardPosition(piece,move,checkmate,depth-1));
+                    moves.Add(new BoardPosition(piece,move,checkmate,depth-1,firstBoardPos));
                 }
                 piece.ClearCells();
             }
