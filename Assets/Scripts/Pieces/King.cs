@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class King : Piece
 {
     bool isWhite;
-    private bool isCheckmate;
+    public bool isCheckmate;
 
     private void Start()
     {

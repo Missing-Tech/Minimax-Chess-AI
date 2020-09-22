@@ -187,17 +187,6 @@ public abstract class Piece : EventTrigger
         cellLastTurn = cell;
     }
 
-    void ClearThreatenedPieces()
-    {
-        //Clears all threatened pieces
-        foreach (var piece in piecesThreatened)
-        {
-            piece.IsThreatened = false;
-            //piece.pieceThreatening = null;
-        }
-        piecesThreatened.Clear();
-    }
-    
     public void ClearCells()
     {
         //Clears all highlighted cells
@@ -246,8 +235,6 @@ public abstract class Piece : EventTrigger
 
     protected bool IsTeamTurn()
     {
-        /*if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)) || 
-            !GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.Black)))*/
         if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)))
         {
             return true;

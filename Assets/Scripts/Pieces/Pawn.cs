@@ -43,8 +43,6 @@ public class Pawn : Piece
         CheckForEnemy(Directions.NorthWest, 1 * teamMultiplier, highlightCells);
     }
 
-    //todo cleanup
-    
     void AddAvailableCell(Vector2Int pos, bool highlightCells)
     {
         if (IsInRange(pos))

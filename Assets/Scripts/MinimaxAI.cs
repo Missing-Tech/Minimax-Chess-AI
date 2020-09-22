@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEditor.Experimental.GraphView;
 using UnityEditorInternal.VersionControl;
 using UnityEngine;
@@ -9,57 +10,65 @@ using static Colours.ColourNames;
 
 public class MinimaxAI : MonoBehaviour
 {
-    private Dictionary<Move, int> _possibleMoves = new Dictionary<Move, int>();
-    private List<Piece> _blackPieces;
     private BoardManager _bm;
+    private BoardPosition _bestPossibleMove;
+    private int searchDepth = 3;
 
     private void Start()
     {
         _bm = FindObjectOfType<BoardManager>();
-        _blackPieces = _bm.blackPieces;
     }
 
     public void DoTurn()
     {
-        _possibleMoves = FindPossibleMoves();
-        //Looks for move with lowest score
-        Move bestMove = _possibleMoves.OrderBy(x => x.Value).First().Key; 
-        Piece pieceToMove = bestMove.piece;
-        pieceToMove.Place(bestMove.move);
-        ClearMoves();
-    }
-
-    void ClearMoves()
-    {
-        foreach (var piece in _bm.blackPieces)
+        var currentBoardPosition = new BoardPosition(searchDepth);
+        //Waits until the board has calculated possible moves
+        while (!currentBoardPosition.finishedCalculating)
         {
-            piece.availableCells.Clear();
+            Thread.Sleep(50);
         }
-        _possibleMoves.Clear();
+        float test = Minimax(searchDepth, currentBoardPosition, false, -Mathf.Infinity,Mathf.Infinity);
+        Debug.Log(test);
+        
+        Piece pieceToMove = _bestPossibleMove.pieceCurrentCell.currentPiece;
+        _bm.blackPieces.Find(x => pieceToMove).Place(_bestPossibleMove.futureCell);
     }
 
-    Dictionary<Move,int> FindPossibleMoves()
+    //White is maximising, black is minimising
+    private float Minimax(int depth, BoardPosition boardPosition, bool isMaximisingPlayer, float alpha, float beta)
     {
-        Dictionary<Move,int> possibleMoves = new Dictionary<Move, int>();
-        foreach (var piece in _bm.blackPieces)
+        if (depth == 0 || boardPosition.isGameOver)
         {
-            if (piece.gameObject.activeSelf)
+            _bestPossibleMove = boardPosition;
+            return boardPosition.staticEvaluation;
+        }
+        if (isMaximisingPlayer)
+        {
+            float maxEval = -Mathf.Infinity;
+            foreach (var nextMove in boardPosition.nextMoves)
             {
-                piece.FindValidMoves(false);
-                foreach (var cell in piece.availableCells)
-                {
-                    int score = _bm.StaticEvaluation();
-                    bool canTake = false;
-                    if (cell.CheckIfOtherTeam(Colours.ColourValue(Black)) && piece.CanTakePiece(cell))
-                    {
-                        //If you can take a piece with the move, adjust the score accordingly
-                        score -= _bm.pieceEvaluation[cell.currentPiece.GetType()];
-                    }
-                    possibleMoves.Add(new Move(piece,cell), score);
-                }
+                float eval = Minimax(depth - 1, nextMove, false, alpha, beta);
+                maxEval = Math.Max(maxEval, eval);
+                alpha = Mathf.Max(alpha, eval);
+                if (beta <= alpha)
+                    break;
             }
+
+            return maxEval;
         }
-        return possibleMoves;
+        else
+        {
+            float minEval = Mathf.Infinity;
+            foreach (var nextMove in boardPosition.nextMoves)
+            {
+                float eval = Minimax(depth - 1, nextMove, true, alpha, beta);
+                minEval = Math.Min(minEval, eval);
+                beta = Mathf.Min(beta, eval);
+                if (beta <= alpha)
+                    break;
+            }
+
+            return minEval;
+        }
     }
-    
 }
