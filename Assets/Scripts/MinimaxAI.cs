@@ -11,8 +11,9 @@ using static Colours.ColourNames;
 public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm;
-    private BoardPosition _bestPossibleMove;
-    private int searchDepth = 3; //Increases search time exponentially
+    private BoardState _bestPossibleMove;
+    private bool searchComplete = false;
+    private int searchDepth = 5; //Increases search time exponentially
 
     private void Start()
     {
@@ -21,69 +22,69 @@ public class MinimaxAI : MonoBehaviour
 
     public void DoTurn()
     {
-        var currentBoardPosition = new BoardPosition(searchDepth);
-        //Waits until the board has calculated possible moves
-        while (!currentBoardPosition.finishedCalculating)
-        {
-            Thread.Sleep(50);
-        }
+        var currentBoardPosition = new BoardState(searchDepth,_bm.board.cellGrid);
+
         float test = Minimax(searchDepth, currentBoardPosition, false, 
             -Mathf.Infinity,Mathf.Infinity);
         Debug.Log(test);
 
         Cell[,] cellGrid = _bm.board.cellGrid;
+
+        bool hasMoved = false;
         
-        for (int x = 0; x < 8; x++)
+        Debug.Log(_bestPossibleMove == null);
+        if (_bestPossibleMove != null)
         {
-            for (int y = 0; y < 8; y++)
+            cellGrid = _bestPossibleMove.CellGrid;
+            foreach (var cell in cellGrid)
             {
-                Cell cell = cellGrid[x,y];
-                Cell newCell = _bestPossibleMove.cellGrid[cell.cellPos.x, cell.cellPos.y];
-                cell.currentPiece = newCell.currentPiece;
                 cell.Refresh();
             }
-            
         }
         GameManager.Instance.IsWhiteTurn = true;
+        
     }
 
     //White is maximising, black is minimising
-    private float Minimax(int depth, BoardPosition boardPosition, bool isMaximisingPlayer, float alpha, float beta)
+    private float Minimax(int depth, BoardState boardState, bool isMaximisingPlayer, float alpha, float beta)
     {
-        if (depth == 0 || boardPosition.isGameOver)
+        if (depth == 0)
         {
-            _bestPossibleMove = boardPosition.firstBoardPos;
-            return boardPosition.staticEvaluation;
+            _bestPossibleMove = boardState.FindFirstMove();
+            searchComplete = true;
+            return boardState.StaticEvaluation;
         }
         if (isMaximisingPlayer)
         {
             float maxEval = -Mathf.Infinity;
-            foreach (var nextMove in boardPosition.nextMoves)
-            {
-                //Recursively calls the function to the layer above in the tree
-                float eval = Minimax(depth - 1, nextMove, false, alpha, beta);
-                maxEval = Math.Max(maxEval, eval);
-                //Alpha beta pruning
-                alpha = Mathf.Max(alpha, eval);
-                if (beta <= alpha)
-                    break;
-            }
+            if (boardState.childrenStates != null)
+                foreach (var nextMove in boardState.childrenStates)
+                {
+                    //Recursively calls the function to the layer above in the tree
+                    float eval = Minimax(depth - 1, nextMove, false, alpha, beta);
+                    maxEval = Math.Max(maxEval, eval);
+                    //Alpha beta pruning
+                    alpha = Mathf.Max(alpha, eval);
+                    if (beta <= alpha)
+                        break;
+                }
 
             return maxEval;
         }
         else
         {
             float minEval = Mathf.Infinity;
-            foreach (var nextMove in boardPosition.nextMoves)
-            {
-                //Recursively calls the function to the layer above in the tree
-                float eval = Minimax(depth - 1, nextMove, true, alpha, beta);
-                minEval = Math.Min(minEval, eval);
-                //Alpha beta pruning
-                beta = Mathf.Min(beta, eval);
-                if (beta <= alpha)
-                    break;
-            }
+            if (boardState.childrenStates != null)
+                foreach (var nextMove in boardState.childrenStates)
+                {
+                    //Recursively calls the function to the layer above in the tree
+                    float eval = Minimax(depth - 1, nextMove, true, alpha, beta);
+                    minEval = Math.Min(minEval, eval);
+                    //Alpha beta pruning
+                    beta = Mathf.Min(beta, eval);
+                    if (beta <= alpha)
+                        break;
+                }
 
             return minEval;
         }

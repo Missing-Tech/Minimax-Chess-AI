@@ -5,43 +5,47 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using TMPro.EditorUtilities;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 //Custom class to store a possible move and the piece it's derived from
 public class BoardPosition
 {
-    public Cell[,] cellGrid;
+    public Cell[,] cellGrid = new Cell[8,8];
     public bool isWhiteMove;
-    public BoardPosition firstBoardPos;
-    public List<BoardPosition> nextMoves;
+    public BoardPosition parentNode;
+    public List<BoardPosition> childNodes;
     public bool finishedCalculating;
     public int staticEvaluation;
     public BoardManager bm;
-    public Cell pieceCurrentCell;
-    public Cell futureCell;
+    //public Cell pieceCurrentCell;
+    //public Cell futureCell;
 
     public bool isGameOver = false;
 
     //Constructor for future positions
-    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver, int depth, BoardPosition previousBoardPos)
+    private BoardPosition(Piece piece, Cell cellToMoveTo, bool isGameOver, int depth)
     {
-        cellGrid = Board.Instance.cellGrid;
+        if (parentNode == null)
+        {
+            parentNode = this;
+        }
+        cellGrid = parentNode.cellGrid;
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
         this.isGameOver = isGameOver;
         bm = BoardManager.Instance;
-        
+
         if (depth > 0)
         {
-            firstBoardPos = previousBoardPos;
-            nextMoves = CalculateNextMoves(depth);
+            childNodes = CalculateNextMoves(depth);
             staticEvaluation = CalculateScore();
         }
         
         /*Manually change piece variable (because it's a hypothetical cell position and
         the piece's shouldn't move on the game screen)*/
-        pieceCurrentCell = cellGrid[piece.cell.cellPos.x, piece.cell.cellPos.y];
+        /*pieceCurrentCell = cellGrid[piece.cell.cellPos.x, piece.cell.cellPos.y];
         pieceCurrentCell.currentPiece = null;
         futureCell = cellGrid[cellToMoveTo.cellPos.x, cellToMoveTo.cellPos.y];
-        futureCell.currentPiece = piece;
+        futureCell.currentPiece = piece;*/
     }
 
     //Constructor for current position
@@ -51,11 +55,11 @@ public class BoardPosition
         isWhiteMove = GameManager.Instance.IsWhiteTurn;
         isGameOver = GameManager.Instance.gameWon;
         bm = BoardManager.Instance;
-        firstBoardPos = this;
+        parentNode = this;
         
         if (depth > 0)
         {
-            nextMoves = CalculateNextMoves(depth);
+            childNodes = CalculateNextMoves(depth);
             staticEvaluation = CalculateScore();
         }
     }
@@ -87,9 +91,11 @@ public class BoardPosition
                         }
                     }
 
-                    moves.Add(new BoardPosition(piece,move,checkmate,depth-1,firstBoardPos));
+                    BoardPosition nextMove = new BoardPosition(piece, move, checkmate, depth - 1);
+                    nextMove.parentNode = parentNode;
+                    moves.Add(nextMove);
                 }
-                piece.ClearCells();
+                //piece.ClearCells();
             }
         }
         finishedCalculating = true;

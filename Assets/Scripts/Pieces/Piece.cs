@@ -16,7 +16,7 @@ public abstract class Piece : EventTrigger
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    private bool isThreatened;
+    private bool _isThreatened;
     public GameObject pieceThreatening;
 
     protected List<Piece> piecesThreatened = new List<Piece>();
@@ -171,16 +171,21 @@ public abstract class Piece : EventTrigger
 
     public void Place(Cell cellToMoveTo)
     {
-        cell.RemovePiece();
-        cell = cellToMoveTo;
-        cell.SetPiece(this);
-        transform.position = cell.GetWorldPos();
+        Move(cellToMoveTo);
 
         if (cell != cellLastTurn)
         {
             EndTurn();
             FindValidMoves(false);
         }
+    }
+
+    public void Move(Cell cellToMoveTo)
+    {
+        cell.RemovePiece();
+        cell = cellToMoveTo;
+        cell.SetPiece(this);
+        transform.position = cell.GetWorldPos();
     }
 
     protected virtual void EndTurn()
@@ -210,11 +215,11 @@ public abstract class Piece : EventTrigger
 
     public bool IsThreatened
     {
-        get => isThreatened;
+        get => _isThreatened;
         set
         {
-            isThreatened = value;
-            if (isThreatened)
+            _isThreatened = value;
+            if (_isThreatened)
             {
                 BeingThreatened();
             }

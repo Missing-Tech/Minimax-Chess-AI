@@ -12,7 +12,7 @@ public class Cell : MonoBehaviour
    public RectTransform rectTransform;
    [HideInInspector] 
    public Piece currentPiece;
-   private GameObject outline;
+   private GameObject _outline;
    
    public void Init(Board board, Vector2Int cellPos)
    {
@@ -20,15 +20,15 @@ public class Cell : MonoBehaviour
       this.board = board;
       this.cellPos = cellPos;
 
-      outline = transform.GetChild(0).gameObject;
-      outline.SetActive(false);
+      _outline = transform.GetChild(0).gameObject;
+      _outline.SetActive(false);
       
       rectTransform = GetComponent<RectTransform>();
    }
 
    public void SetOutline(bool active)
    {
-      outline.SetActive(active);
+      _outline.SetActive(active);
    }
 
    public void Refresh()
