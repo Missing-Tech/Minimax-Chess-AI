@@ -16,7 +16,7 @@ public abstract class Piece : EventTrigger
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    private bool isThreatened;
+    private bool _isThreatened;
     public GameObject pieceThreatening;
 
     protected List<Piece> piecesThreatened = new List<Piece>();
@@ -118,14 +118,16 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
+                /*if (pieceColor.Equals(ColourValue(ColourNames.Black)))
                 {
                     newPos -= convertDirectionToVector2[direction];
                 }
                 else
                 {
                     newPos += convertDirectionToVector2[direction];
-                }
+                }*/
+                
+                newPos += convertDirectionToVector2[direction];
 
                 //Checks if the move is on the board
                 if (IsInRange(newPos))
@@ -169,16 +171,21 @@ public abstract class Piece : EventTrigger
 
     public void Place(Cell cellToMoveTo)
     {
-        cell.RemovePiece();
-        cell = cellToMoveTo;
-        cell.SetPiece(this);
-        transform.position = cell.GetWorldPos();
+        Move(cellToMoveTo);
 
         if (cell != cellLastTurn)
         {
             EndTurn();
             FindValidMoves(false);
         }
+    }
+
+    public void Move(Cell cellToMoveTo)
+    {
+        cell.RemovePiece();
+        cell = cellToMoveTo;
+        cell.SetPiece(this);
+        transform.position = cell.GetWorldPos();
     }
 
     protected virtual void EndTurn()
@@ -208,11 +215,11 @@ public abstract class Piece : EventTrigger
 
     public bool IsThreatened
     {
-        get => isThreatened;
+        get => _isThreatened;
         set
         {
-            isThreatened = value;
-            if (isThreatened)
+            _isThreatened = value;
+            if (_isThreatened)
             {
                 BeingThreatened();
             }

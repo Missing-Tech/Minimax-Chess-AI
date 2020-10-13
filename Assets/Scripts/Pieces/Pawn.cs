@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class Pawn : Piece
 {
-    private bool isFirstMove;
+    private bool _isFirstMove;
     
     
     protected override void SetDirections()
     {
-        isFirstMove = true;
+        _isFirstMove = true;
         
         base.SetDirections();
         availableDirections = new Directions[]
@@ -22,7 +22,7 @@ public class Pawn : Piece
     protected override void EndTurn()
     {
         base.EndTurn();
-        isFirstMove = false;
+        _isFirstMove = false;
     }
 
     public override void FindValidMoves(bool highlightCells)
@@ -32,7 +32,7 @@ public class Pawn : Piece
 
         if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
         {
-            if (isFirstMove)
+            if (_isFirstMove)
             {
                 AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
             }
@@ -58,7 +58,7 @@ public class Pawn : Piece
 
     public override bool CanTakePiece(Cell cell)
     {
-        if (!isFirstMove)
+        if (!_isFirstMove)
         {
             if (availableCells.Contains(cell) && availableCells.IndexOf(cell) != 0)
             {

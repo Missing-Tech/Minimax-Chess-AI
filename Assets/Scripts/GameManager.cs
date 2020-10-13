@@ -35,7 +35,10 @@ public class GameManager : MonoBehaviour
         set
         {
             isWhiteTurn = value;
-            bm.EndTurn();
+            if (!isWhiteTurn)
+            {
+                bm.EndTurn();
+            }
         }
     }
 

@@ -23,7 +23,7 @@ public class BoardManager : MonoBehaviour
     [Tooltip("0 = Rook, 1 = Knight, 2 = Bishop, 3 = Queen, 4 = King, 5 = Pawn")]
     public Sprite[] pieceSprites;
 
-    private int[] royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
+    private int[] _royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
     
 
     private Dictionary<int, Type> pieceConverter = new Dictionary<int, Type>()
@@ -77,12 +77,12 @@ public class BoardManager : MonoBehaviour
             spawnedPiece.transform.SetParent(transform);
 
             //Checks what piece type it should be
-            var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[royalRow[x]];
+            var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[_royalRow[x]];
             spawnedPiece.AddComponent(pieceType);
 
             //Stores the piece component since it's called multiple times
             var pieceComponent = spawnedPiece.GetComponent<Piece>();
-            pieceComponent.PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[royalRow[x]];
+            pieceComponent.PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[_royalRow[x]];
             spawnedPieceCell.SetPiece(pieceComponent);
 
             if (whitePiece)
@@ -105,7 +105,15 @@ public class BoardManager : MonoBehaviour
             ai.DoTurn();
         }
     }
-    
+
+    public void RefreshBoard()
+    {
+        foreach (var cell in board.cellGrid)
+        {
+            cell.Refresh();
+        }
+    }
+
     public void ResetBoard()
     {
         GameManager.Instance.Reset();
