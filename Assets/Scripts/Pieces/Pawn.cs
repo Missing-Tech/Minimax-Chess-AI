@@ -32,11 +32,14 @@ public class Pawn : Piece
 
         if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
         {
-            if (_isFirstMove)
+            if (_isFirstMove && IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier * 2)))
             {
                 AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
             }
-            AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier), highlightCells);
+            if (IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier)))
+            {
+                AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier), highlightCells);
+            }
         }
 
         CheckForEnemy(Directions.NorthEast, 1 * teamMultiplier, highlightCells);

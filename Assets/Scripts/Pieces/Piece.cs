@@ -9,7 +9,7 @@ using static Colours;
 public abstract class Piece : EventTrigger
 {
     public Cell originalCell;
-    protected Cell cellLastTurn;
+    public Cell cellLastTurn;
     public Cell cell;
     
     protected Sprite pieceSprite;
@@ -118,16 +118,16 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                /*if (pieceColor.Equals(ColourValue(ColourNames.Black)))
+                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
                 {
                     newPos -= convertDirectionToVector2[direction];
                 }
                 else
                 {
                     newPos += convertDirectionToVector2[direction];
-                }*/
+                }
                 
-                newPos += convertDirectionToVector2[direction];
+                //newPos += convertDirectionToVector2[direction];
 
                 //Checks if the move is on the board
                 if (IsInRange(newPos))
@@ -176,7 +176,7 @@ public abstract class Piece : EventTrigger
         if (cell != cellLastTurn)
         {
             EndTurn();
-            FindValidMoves(false);
+            //FindValidMoves(false);
         }
     }
 
@@ -252,7 +252,7 @@ public abstract class Piece : EventTrigger
     protected bool IsInRange(Vector2 pos)
     {
         if (pos.x < 8 && pos.y < 8 &&
-            pos.x >= 0 && pos.y >= 0)
+            pos.x >= 0 && pos.y > 0)
         {
             return true;
         }

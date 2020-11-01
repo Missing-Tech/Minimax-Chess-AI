@@ -1,111 +1,107 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using JetBrains.Annotations;
-using Unity.Collections;
+using System.Linq;
+using System.Threading;
+using UnityEditor.Experimental.GraphView;
+using UnityEditorInternal.VersionControl;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
+using static Colours.ColourNames;
 
 public class BoardState
 {
-    private Cell[,] _cellGrid = new Cell[8,8];
+    private Cell[,] _cellGrid = new Cell[8, 8];
 
     public Cell[,] CellGrid => _cellGrid;
 
     private BoardState _parentState;
-    public List<BoardState> childrenStates;
-    private int _depth, _maxDepth;
 
-    private BoardState(int maxDepth,int depth, BoardState parentState, 
+    public BoardState ParentState => _parentState;
+
+    public List<BoardState> childrenStates;
+
+    public Piece pieceToMove;
+    public Cell cellToMove;
+
+    public List<BoardState> ChildrenStates
+    {
+        get
+        {
+            if (childrenStates == null || childrenStates.Count == 0)
+            {
+                return CreateChildrenStates();
+            }
+
+            return childrenStates;
+        }
+    }
+
+    public int _depth, _maxDepth;
+
+    private BoardState(int maxDepth, int depth, BoardState parentState,
         Cell[,] cellGrid, Piece pieceToMove, Cell cellToMove)
     {
         _maxDepth = maxDepth;
         _depth = depth;
-        _parentState = parentState;
         _cellGrid = cellGrid;
-        cellGrid[pieceToMove.cell.cellPos.x,pieceToMove.cell.cellPos.y].currentPiece.Place(cellToMove);
-        childrenStates = new List<BoardState>();
-        if (_depth <= _maxDepth)
+        this.pieceToMove = pieceToMove;
+        this.cellToMove = cellToMove;
+        _parentState = parentState;
+        
+        if (depth == 1)
         {
-            childrenStates = CreateChildrenStates();
+            _parentState.pieceToMove = pieceToMove;
+            _parentState.cellToMove = cellToMove;
         }
     }
 
-    public BoardState(int maxDepth, Cell[,] cellGrid)
+    public BoardState(int maxDepth, Cell[,] cellGrid, int depth)
     {
         _maxDepth = maxDepth;
-        _depth = maxDepth;
+        _depth = depth;
         _parentState = this;
+        pieceToMove = null;
+        cellToMove = null;
         _cellGrid = cellGrid;
-        childrenStates = new List<BoardState>();
-        if (_depth <= _maxDepth)
-        {
-            childrenStates = CreateChildrenStates();
-        }
     }
-    
-    public BoardState FindFirstMove()
-    {
-        BoardState parentState = this;
-        while (parentState._depth != 1)
-        {
-            parentState = _parentState.FindFirstMove();
-        }
-        return parentState;
-    }
-    
+
     public List<BoardState> CreateChildrenStates()
     {
         List<BoardState> localChildrenStates = new List<BoardState>();
-        if (_depth < _maxDepth)
+
+        foreach (var cell in _cellGrid)
         {
-            foreach (var cell in _cellGrid)
+            Piece piece = cell.currentPiece;
+            if (piece != null)
             {
-                if (cell.currentPiece != null)
+                bool isAITurn = _depth % 2 != 0; //Returns false if it's the AI's turn
+                                                 //AI turns are odd depth values
+                bool canMoveThePiece = (piece.PieceColor.Equals(Colours.ColourValue(White)) && !isAITurn) ||
+                                       (piece.PieceColor.Equals(Colours.ColourValue(Black)) && isAITurn);
+                if (!canMoveThePiece)
                 {
-                    Piece piece = cell.currentPiece;
                     piece.FindValidMoves(false);
-                    foreach (var availableCell in piece.availableCells)
+                    Cell[] availableCells = piece.availableCells.ToArray();
+                    foreach (var availableCell in availableCells)
                     {
-                        localChildrenStates.Add(new BoardState(_maxDepth,_depth+1,this,
-                            _cellGrid,piece,availableCell));
+                        Cell[,] newCellGrid = new Cell[8,8];
+                        newCellGrid = _cellGrid;
+                        Cell newCellPos = newCellGrid[availableCell.cellPos.x, availableCell.cellPos.y];
+
+                        if (newCellPos.CheckIfOtherTeam(piece.PieceColor))
+                        {
+                            newCellPos.currentPiece.gameObject.SetActive(false);
+                        }
+
+                        BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
+                            newCellGrid, piece, availableCell);
+                        localChildrenStates.Add(childBoardState);
                     }
                     piece.ClearCells();
                 }
             }
         }
+
         return localChildrenStates;
     }
-
-    public int StaticEvaluation
-    {
-        get
-        {
-            return CalculateStaticEvaluation();
-        }
-    }
-
-    private int CalculateStaticEvaluation()
-    {
-        int score = 0;
-        foreach (var cell in _cellGrid)
-        {
-            if (cell.currentPiece != null)
-            {
-                if (cell.currentPiece.gameObject.activeSelf)
-                {
-                    if (cell.currentPiece.PieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)))
-                    {
-                        score += BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
-                    }
-                    else
-                    {
-                        score -= BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
-                    }
-                }
-            }
-        }
-        return score;
-    }
-    
 }

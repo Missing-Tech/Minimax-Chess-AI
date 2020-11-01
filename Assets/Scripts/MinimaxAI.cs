@@ -12,8 +12,7 @@ public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm;
     private BoardState _bestPossibleMove;
-    private bool searchComplete = false;
-    private int searchDepth = 5; //Increases search time exponentially
+    private int searchDepth = 4; //Increases search time exponentially
 
     private void Start()
     {
@@ -22,27 +21,26 @@ public class MinimaxAI : MonoBehaviour
 
     public void DoTurn()
     {
-        var currentBoardPosition = new BoardState(searchDepth,_bm.board.cellGrid);
+        var currentBoardPosition = new BoardState(searchDepth,_bm.board.cellGrid,searchDepth);
 
-        float test = Minimax(searchDepth, currentBoardPosition, false, 
+        //Calls a recursive depth search on a tree of possible board states
+        //The 'alpha' and 'beta' values are used for alpha-beta pruning which optimises the search
+        Minimax(searchDepth, currentBoardPosition, false, 
             -Mathf.Infinity,Mathf.Infinity);
-        Debug.Log(test);
 
-        Cell[,] cellGrid = _bm.board.cellGrid;
-
-        bool hasMoved = false;
+        //Local reference to the cell grid
+        Cell[,] cellGrid = new Cell[8,8];
+        cellGrid = _bm.board.cellGrid;
         
-        Debug.Log(_bestPossibleMove == null);
         if (_bestPossibleMove != null)
         {
-            cellGrid = _bestPossibleMove.CellGrid;
-            foreach (var cell in cellGrid)
-            {
-                cell.Refresh();
-            }
+            Piece pieceToMove = _bm.blackPieces.Find(x => x == _bestPossibleMove.pieceToMove);
+            Cell cellToMove = cellGrid[_bestPossibleMove.cellToMove.cellPos.x, _bestPossibleMove.cellToMove.cellPos.y];
+            pieceToMove.Place(cellToMove);
+            Debug.Log(cellToMove.cellPos);
         }
-        GameManager.Instance.IsWhiteTurn = true;
-        
+
+        _bestPossibleMove = null;
     }
 
     //White is maximising, black is minimising
@@ -50,15 +48,14 @@ public class MinimaxAI : MonoBehaviour
     {
         if (depth == 0)
         {
-            _bestPossibleMove = boardState.FindFirstMove();
-            searchComplete = true;
-            return boardState.StaticEvaluation;
+            _bestPossibleMove = boardState.ParentState;
+            return CalculateStaticEvaluation(boardState.CellGrid);
         }
+        
         if (isMaximisingPlayer)
         {
             float maxEval = -Mathf.Infinity;
-            if (boardState.childrenStates != null)
-                foreach (var nextMove in boardState.childrenStates)
+            foreach (var nextMove in boardState.ChildrenStates)
                 {
                     //Recursively calls the function to the layer above in the tree
                     float eval = Minimax(depth - 1, nextMove, false, alpha, beta);
@@ -68,14 +65,12 @@ public class MinimaxAI : MonoBehaviour
                     if (beta <= alpha)
                         break;
                 }
-
             return maxEval;
         }
         else
         {
             float minEval = Mathf.Infinity;
-            if (boardState.childrenStates != null)
-                foreach (var nextMove in boardState.childrenStates)
+            foreach (var nextMove in boardState.ChildrenStates)
                 {
                     //Recursively calls the function to the layer above in the tree
                     float eval = Minimax(depth - 1, nextMove, true, alpha, beta);
@@ -88,5 +83,29 @@ public class MinimaxAI : MonoBehaviour
 
             return minEval;
         }
+    }
+    
+    private int CalculateStaticEvaluation(Cell[,] cellGrid)
+    {
+        int score = 0;
+        foreach (var cell in cellGrid)
+        {
+            if (cell.currentPiece != null)
+            {
+                if (cell.currentPiece.gameObject.activeSelf)
+                {
+                    if (cell.currentPiece.PieceColor.Equals(Colours.ColourValue(White)))
+                    {
+                        score += BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
+                    }
+                    else if (cell.currentPiece.PieceColor.Equals(Colours.ColourValue(Black)))
+                    {
+                        score -= BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
+                    }
+                }
+            }
+        }
+
+        return score;
     }
 }
