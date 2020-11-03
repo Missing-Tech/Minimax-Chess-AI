@@ -12,7 +12,7 @@ public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm;
     private BoardState _bestPossibleMove;
-    private int searchDepth = 4; //Increases search time exponentially
+    private int searchDepth = 7; //Increases search time exponentially
 
     private void Start()
     {
@@ -36,6 +36,12 @@ public class MinimaxAI : MonoBehaviour
         {
             Piece pieceToMove = _bm.blackPieces.Find(x => x == _bestPossibleMove.pieceToMove);
             Cell cellToMove = cellGrid[_bestPossibleMove.cellToMove.cellPos.x, _bestPossibleMove.cellToMove.cellPos.y];
+
+            if (cellToMove.CheckIfOtherTeam(pieceToMove.PieceColor))
+            {
+                cellToMove.currentPiece.gameObject.SetActive(false);
+            }
+
             pieceToMove.Place(cellToMove);
             Debug.Log(cellToMove.cellPos);
         }
@@ -46,18 +52,20 @@ public class MinimaxAI : MonoBehaviour
     //White is maximising, black is minimising
     private float Minimax(int depth, BoardState boardState, bool isMaximisingPlayer, float alpha, float beta)
     {
-        if (depth == 0)
+        if (depth == 1)
         {
             _bestPossibleMove = boardState.ParentState;
-            return CalculateStaticEvaluation(boardState.CellGrid);
+            _bestPossibleMove.pieceToMove = boardState.pieceToMove;
+            _bestPossibleMove.cellToMove = boardState.cellToMove;
+            return CalculateStaticEvaluation(boardState.CellGrid, boardState);
         }
         
         if (isMaximisingPlayer)
         {
             float maxEval = -Mathf.Infinity;
             foreach (var nextMove in boardState.ChildrenStates)
-                {
-                    //Recursively calls the function to the layer above in the tree
+            {
+                //Recursively calls the function to the layer above in the tree
                     float eval = Minimax(depth - 1, nextMove, false, alpha, beta);
                     maxEval = Math.Max(maxEval, eval);
                     //Alpha beta pruning
@@ -85,7 +93,7 @@ public class MinimaxAI : MonoBehaviour
         }
     }
     
-    private int CalculateStaticEvaluation(Cell[,] cellGrid)
+    private int CalculateStaticEvaluation(Cell[,] cellGrid, BoardState boardState)
     {
         int score = 0;
         foreach (var cell in cellGrid)
@@ -106,6 +114,22 @@ public class MinimaxAI : MonoBehaviour
             }
         }
 
+        var allPieces = _bm.whitePieces.Concat(_bm.blackPieces);
+        Piece pieceToMove = allPieces.ToList().Find(x => x == _bestPossibleMove.pieceToMove);
+        Cell cellToMove = cellGrid[_bestPossibleMove.cellToMove.cellPos.x, _bestPossibleMove.cellToMove.cellPos.y];
+
+        if (cellToMove.CheckIfOtherTeam(pieceToMove.PieceColor))
+        {
+            if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(White)))
+            {
+                score += BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
+            }
+            else if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(Black)))
+            {
+                score -= BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
+            }
+        }
+        
         return score;
     }
 }

@@ -161,9 +161,6 @@ public abstract class Piece : EventTrigger
                         if (!canJumpOverPieces)
                             break;
                     }
-
-                    //Add the current cell the piece is on so you can put the piece back down
-                    availableCells.Add(cell);
                 }
             }
         }
@@ -264,6 +261,8 @@ public abstract class Piece : EventTrigger
         if(IsTeamTurn())
         {
             base.OnBeginDrag(eventData);
+            //Add the current cell the piece is on so you can put the piece back down
+            availableCells.Add(cell);
             FindValidMoves(true);
             outline.SetActive(true);
         }

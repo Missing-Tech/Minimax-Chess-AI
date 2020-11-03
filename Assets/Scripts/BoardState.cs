@@ -48,11 +48,11 @@ public class BoardState
         this.cellToMove = cellToMove;
         _parentState = parentState;
         
-        if (depth == 1)
+        /*if (depth == 1)
         {
             _parentState.pieceToMove = pieceToMove;
             _parentState.cellToMove = cellToMove;
-        }
+        }*/
     }
 
     public BoardState(int maxDepth, Cell[,] cellGrid, int depth)
@@ -86,12 +86,12 @@ public class BoardState
                     {
                         Cell[,] newCellGrid = new Cell[8,8];
                         newCellGrid = _cellGrid;
-                        Cell newCellPos = newCellGrid[availableCell.cellPos.x, availableCell.cellPos.y];
+                        /*Cell newCellPos = newCellGrid[availableCell.cellPos.x, availableCell.cellPos.y];
 
                         if (newCellPos.CheckIfOtherTeam(piece.PieceColor))
                         {
                             newCellPos.currentPiece.gameObject.SetActive(false);
-                        }
+                        }*/
 
                         BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
                             newCellGrid, piece, availableCell);

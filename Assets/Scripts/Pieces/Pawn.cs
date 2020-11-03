@@ -32,7 +32,8 @@ public class Pawn : Piece
 
         if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
         {
-            if (_isFirstMove && IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier * 2)))
+            if (_isFirstMove && IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier * 2)) 
+                && !cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (2 * teamMultiplier)].CheckForAnyPiece())
             {
                 AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
             }
