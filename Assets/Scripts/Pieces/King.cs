@@ -56,12 +56,6 @@ public class King : Piece
                     List<Piece> enemyPieces = !isWhite
                         ? FindObjectOfType<BoardManager>().whitePieces
                         : FindObjectOfType<BoardManager>().blackPieces;
-                    
-                    /*List<Piece> friendlyPieces = isWhite
-                        ? FindObjectOfType<BoardManager>().whitePieces
-                        : FindObjectOfType<BoardManager>().blackPieces;
-
-                    friendlyPieces.Remove(this);*/
 
                     bool isSafeMove = true;
 
@@ -86,25 +80,7 @@ public class King : Piece
                     {
                         isCheckmate = true;
                     }
-                    
-                    //Check if a friendly piece can block the enemy
-                    /*foreach (var piece in friendlyPieces)
-                    {
-                        pieceThreatening.GetComponent<Piece>().FindValidMoves(false);
-                        List<Cell> threatenedPieceMoves = pieceThreatening.GetComponent<Piece>().availableCells;
-                        
-                        piece.FindValidMoves(false);
-                        foreach (var move in threatenedPieceMoves)
-                        {
-                            if (piece.availableCells.Contains(move))
-                            {
-                                Debug.Log("qwoop");
-                                isCheckmate = false;
-                                //break;
-                            }
-                        }
-                    }*/
-                        
+
                 }
             }
         }
