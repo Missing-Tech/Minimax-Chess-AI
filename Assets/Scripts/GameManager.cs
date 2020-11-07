@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI winText;
     public bool gameWon;
+    public List<Cell> validCheckCells;
     private BoardManager bm;
     private bool isWhiteTurn = true;
     

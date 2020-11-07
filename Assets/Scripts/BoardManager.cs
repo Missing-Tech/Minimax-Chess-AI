@@ -24,7 +24,8 @@ public class BoardManager : MonoBehaviour
     public Sprite[] pieceSprites;
 
     private int[] _royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
-    
+
+    public List<King> kings;
 
     private Dictionary<int, Type> pieceConverter = new Dictionary<int, Type>()
     {
@@ -65,10 +66,12 @@ public class BoardManager : MonoBehaviour
         SpawnRow(false, 7, false);
     }
 
-    void SpawnRow(bool pawnRow, int cellColumn, bool whitePiece)
+    void SpawnRow(bool isPawnRow, int cellColumn, bool isWhitePiece)
     {
         for (int x = 0; x < 8; x++)
         {
+            bool isKing;
+            
             //Gets the cell where to spawn the piece
             //More performant than multiple calls to the array
             var spawnedPieceCell = board.cellGrid[x, cellColumn];
@@ -77,15 +80,17 @@ public class BoardManager : MonoBehaviour
             spawnedPiece.transform.SetParent(transform);
 
             //Checks what piece type it should be
-            var pieceType = pawnRow ? typeof(Pawn) : pieceConverter[_royalRow[x]];
+            var pieceType = isPawnRow ? typeof(Pawn) : pieceConverter[_royalRow[x]];
             spawnedPiece.AddComponent(pieceType);
+
+            isKing = pieceType == typeof(King);
 
             //Stores the piece component since it's called multiple times
             var pieceComponent = spawnedPiece.GetComponent<Piece>();
-            pieceComponent.PieceSprite = pawnRow ? pieceSprites[5] : pieceSprites[_royalRow[x]];
+            pieceComponent.PieceSprite = isPawnRow ? pieceSprites[5] : pieceSprites[_royalRow[x]];
             spawnedPieceCell.SetPiece(pieceComponent);
 
-            if (whitePiece)
+            if (isWhitePiece)
             {
                 whitePieces.Add(spawnedPiece.GetComponent<Piece>());
                 pieceComponent.Init(spawnedPieceCell, Colours.ColourValue(White));
@@ -95,11 +100,28 @@ public class BoardManager : MonoBehaviour
                 blackPieces.Add(spawnedPiece.GetComponent<Piece>());
                 pieceComponent.Init(spawnedPieceCell, Colours.ColourValue(Black));
             }
+
+            if (isKing)
+            {
+                kings.Add(spawnedPiece.GetComponent<King>());
+            }
         }
     }
 
     public void EndTurn()
     {
+        foreach (var king in kings)
+        {
+            if (king.isCheckmate)
+            {
+                bool _isWhite = king.PieceColor.Equals(Colours.ColourValue(White));
+                Debug.Log("checkmate");
+                GameManager.Instance.Win(_isWhite);
+                Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
+            }
+        }
+        
+        
         if (!GameManager.Instance.IsWhiteTurn)
         {
             ai.DoTurn();

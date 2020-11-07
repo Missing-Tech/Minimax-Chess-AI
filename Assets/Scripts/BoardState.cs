@@ -93,15 +93,18 @@ public class BoardState
                                                  //AI turns are odd depth values
                 bool canMoveThePiece = (piece.PieceColor.Equals(Colours.ColourValue(White)) && !isAITurn) ||
                                        (piece.PieceColor.Equals(Colours.ColourValue(Black)) && isAITurn);
-                if (!canMoveThePiece)
+                if (!canMoveThePiece) //If it's on the AI's turn
                 {
                     piece.FindValidMoves(false);
                     Cell[] availableCells = piece.availableCells.ToArray();
+                    //Check every cell the piece can move to
                     foreach (var availableCell in availableCells)
                     {
+                        //Create a local cell grid
                         Cell[,] newCellGrid = new Cell[8,8];
                         newCellGrid = _cellGrid;
 
+                        //Create a new board state as a child
                         BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
                             newCellGrid, piece, availableCell);
                         localChildrenStates.Add(childBoardState);

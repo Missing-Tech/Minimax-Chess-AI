@@ -52,6 +52,16 @@ public class Pawn : Piece
         if (IsInRange(pos))
         {
             Cell newCell = cell.board.cellGrid[pos.x, pos.y];
+            //White is 0, black is 1
+            int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+            King king = BoardManager.Instance.kings[blackOrWhite];
+            if (king.inCheck)
+            {
+                if (!GameManager.Instance.validCheckCells.Contains(newCell))
+                {
+                    return;
+                }
+            }
             availableCells.Add(newCell);
             if (highlightCells)
             {

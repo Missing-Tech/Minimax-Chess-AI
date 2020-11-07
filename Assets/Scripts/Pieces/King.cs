@@ -4,10 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static Colours;
+
 public class King : Piece
 {
     bool isWhite;
     public bool isCheckmate;
+    public bool inCheck;
+
+    public bool IsCheckmate
+    {
+        get
+        {
+            return CheckIfCheckmate();
+        }
+    }
 
     private void Start()
     {
@@ -30,60 +41,119 @@ public class King : Piece
             Directions.NorthWest
         };
     }
-    
-    protected override void BeingThreatened()
+
+    bool CheckIfCheckmate()
     {
-        base.BeingThreatened();
-        Debug.Log(IsThreatened);
-        CheckForNearbyMoves();
-        if (isCheckmate)
+        bool _isCheckmate = false;
+
+        if (CheckEveryDirection(cell))
         {
-            GameManager.Instance.Win(isWhite);
+            inCheck = true;
+            FindValidMoves(false);
+            if (availableCells.Count == 0)
+            {
+                _isCheckmate = true;
+            }
+            
+            //Checks if the cells it can move into are in danger
+            int noOfDangerCells = 0;
+            foreach (var availableCell in availableCells)
+            {
+                if(CheckEveryDirection(availableCell))
+                {
+                    noOfDangerCells++;
+                }
+            }
+
+            //If all of the cells it can move into are dangerous then it's in checkmate
+            if (noOfDangerCells == availableCells.Count)
+            {
+                _isCheckmate = true;
+            }
+            
+            ClearCells();
         }
+        else
+        {
+            inCheck = false;
+        }
+        
+        return _isCheckmate;
     }
 
-    void CheckForNearbyMoves()
+    //Returns true if the cell is in danger
+    bool CheckEveryDirection(Cell cellToCheck)
     {
-        foreach (var direction in availableDirections)
+        foreach (Directions direction in (Directions[]) Enum.GetValues(typeof(Directions)))
         {
-            Vector2 cellPos = cell.cellPos + convertDirectionToVector2[direction];
-            if (IsInRange(cellPos))
+            bool isKnightDirection = direction.ToString().Contains("L");
+            Vector2Int checkCellPos = cellToCheck.cellPos;
+            for (int i = 1; i <= 8; i++)
             {
-                Cell cellToCheck = cell.board.cellGrid[(int) cellPos.x, (int) cellPos.y];
-                if (cellToCheck.CheckForAnyPiece())
+                if (isKnightDirection && i > 1)
                 {
-                    //Store all pieces locally
-                    List<Piece> enemyPieces = !isWhite
-                        ? FindObjectOfType<BoardManager>().whitePieces
-                        : FindObjectOfType<BoardManager>().blackPieces;
-
-                    bool isSafeMove = true;
-
-                    //Check if any enemy can move to the cell
-                    foreach (var piece in enemyPieces)
+                    break;
+                }
+                //Flips the vector if the player is on the black side
+                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
+                {
+                    checkCellPos -= Vector2Int.RoundToInt(convertDirectionToVector2[direction]);
+                }
+                else
+                {
+                    checkCellPos += Vector2Int.RoundToInt(convertDirectionToVector2[direction]);
+                }
+                Cell checkCell = null;
+                if (IsInRange(checkCellPos))
+                {
+                    checkCell = BoardManager.Instance.board.cellGrid[checkCellPos.x, checkCellPos.y];
+                }
+                if (checkCell != null)
+                {
+                    if (checkCell.CheckIfOtherTeam(pieceColor))
                     {
-                        piece.FindValidMoves(false);
-                        if (!piece.availableCells.Contains(cellToCheck))
+                        Piece piece = checkCell.currentPiece;
+                        if (i > piece.radius)
                         {
-                            isSafeMove = false;
                             break;
                         }
-                        //piece.ClearCells();
+                        //Temporarily lets the piece jump over other pieces so that the king
+                        //Stops an edge case where the king can move away from a piece but still be in check
+                        bool couldJumpOverPieces = piece.canJumpOverPieces;
+                        piece.canJumpOverPieces = true;
+                        
+                        piece.FindValidMoves(false);
+                        if (piece.availableCells.Contains(cellToCheck))
+                        {
+                            if (cellToCheck == cell)
+                            {
+                                GameManager.Instance.validCheckCells.Add(piece.cell);
+                            }
+                            piece.canJumpOverPieces = couldJumpOverPieces;
+                            return true;
+                        }
+                        piece.canJumpOverPieces = couldJumpOverPieces;
                     }
-
-                    if (isSafeMove)
-                    {
-                        availableCells.Add(cellToCheck);
-                        isCheckmate = false;
-                    }
-                    else
-                    {
-                        isCheckmate = true;
-                    }
-
                 }
             }
         }
-        //pieceThreatening.ClearCells();
+        return false;
+    }
+
+    public override void FindValidMoves(bool highlightCells)
+    {
+        base.FindValidMoves(highlightCells);
+        Cell[] _availableCells = availableCells.ToArray();
+        foreach (var availableCell in _availableCells)
+        {
+            if (CheckEveryDirection(availableCell))
+            {
+                if (highlightCells)
+                {
+                    availableCell.SetOutline(false);
+                }
+                availableCells.Remove(availableCell);
+            }
+        }
     }
 }
