@@ -112,13 +112,13 @@ public class BoardManager : MonoBehaviour
     {
         foreach (var king in kings)
         {
-            if (king.isCheckmate)
+            if (king.IsCheckmate)
             {
                 bool _isWhite = king.PieceColor.Equals(Colours.ColourValue(White));
                 Debug.Log("checkmate");
                 GameManager.Instance.Win(_isWhite);
-                Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
             }
+            Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
         }
         
         

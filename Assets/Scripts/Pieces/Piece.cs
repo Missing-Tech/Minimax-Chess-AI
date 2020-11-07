@@ -15,7 +15,8 @@ public abstract class Piece : EventTrigger
     protected Sprite pieceSprite;
     protected Color32 pieceColor;
     protected GameObject outline;
-    public bool canJumpOverPieces = false;
+    protected bool canJumpOverPieces = false;
+    public bool canJumpOverEnemyPieces = false;
     
     public Sprite PieceSprite
     {
@@ -165,6 +166,12 @@ public abstract class Piece : EventTrigger
                         }
                     }
 
+                    //Used for checkmate edge case
+                    if (availableCell.CheckIfOtherTeam(pieceColor) && !canJumpOverEnemyPieces)
+                    {
+                        break;
+                    }
+                    
                     //If there's a piece there and the piece can't jump over it
                     if (availableCell.CheckForAnyPiece() && !canJumpOverPieces)
                     {

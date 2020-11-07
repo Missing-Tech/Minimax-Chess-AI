@@ -75,7 +75,7 @@ public class King : Piece
         }
         else
         {
-            inCheck = false;
+            inCheck = false; 
         }
         
         return _isCheckmate;
@@ -119,8 +119,8 @@ public class King : Piece
                         }
                         //Temporarily lets the piece jump over other pieces so that the king
                         //Stops an edge case where the king can move away from a piece but still be in check
-                        bool couldJumpOverPieces = piece.canJumpOverPieces;
-                        piece.canJumpOverPieces = true;
+                        bool couldJumpOverPieces = piece.canJumpOverEnemyPieces;
+                        piece.canJumpOverEnemyPieces = true;
                         
                         piece.FindValidMoves(false);
                         if (piece.availableCells.Contains(cellToCheck))
@@ -129,10 +129,10 @@ public class King : Piece
                             {
                                 GameManager.Instance.validCheckCells.Add(piece.cell);
                             }
-                            piece.canJumpOverPieces = couldJumpOverPieces;
+                            piece.canJumpOverEnemyPieces = couldJumpOverPieces;
                             return true;
                         }
-                        piece.canJumpOverPieces = couldJumpOverPieces;
+                        piece.canJumpOverEnemyPieces = couldJumpOverPieces;
                     }
                 }
             }
