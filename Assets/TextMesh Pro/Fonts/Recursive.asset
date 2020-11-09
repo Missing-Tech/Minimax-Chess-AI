@@ -54,7 +54,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Recursive Material
   m_Shader: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
-  m_ShaderKeywords: UNDERLAY_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hashCode: 405878714
   material: {fileID: -1052095887863216510}
-  materialHashCode: -694623247
+  materialHashCode: -1169429158
   m_Version: 1.1.0
   m_SourceFontFileGUID: 9218a05bfef08494e938aee024fb23e6
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 9218a05bfef08494e938aee024fb23e6, type: 3}

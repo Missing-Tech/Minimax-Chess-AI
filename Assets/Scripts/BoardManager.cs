@@ -118,9 +118,10 @@ public class BoardManager : MonoBehaviour
                 Debug.Log("checkmate");
                 GameManager.Instance.Win(_isWhite);
             }
-            Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
+            //Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
         }
         
+        GameManager.Instance.UpdateScoreText();
         
         if (!GameManager.Instance.IsWhiteTurn)
         {

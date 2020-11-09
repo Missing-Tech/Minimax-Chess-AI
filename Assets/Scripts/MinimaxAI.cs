@@ -12,7 +12,9 @@ public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm; //Local reference to the BoardManager object
     private BoardState _bestPossibleMove; //The final move the AI decides to do
-    private int searchDepth = 3; //Increases search time exponentially
+    public float score;
+    public Vector2 movePos;
+    private int searchDepth = 5; //Increases search time exponentially
 
     private void Start()
     {
@@ -30,10 +32,8 @@ public class MinimaxAI : MonoBehaviour
 
         //Calls a recursive depth search on a tree of possible board states
         //The 'alpha' and 'beta' values are used for alpha-beta pruning which optimises the search
-        float value = Minimax(searchDepth, currentBoardPosition, false, 
+        score = Minimax(searchDepth, currentBoardPosition, false, 
             -Mathf.Infinity,Mathf.Infinity);
-        
-        Debug.Log(value);
 
         //Local reference to the cell grid
         Cell[,] cellGrid = new Cell[8,8];
@@ -56,6 +56,8 @@ public class MinimaxAI : MonoBehaviour
             //Move the piece to the cell
             pieceToMove.Place(cellToMove);
         }
+
+        movePos = _bestPossibleMove.cellToMove.cellPos;
 
         //Resets the move for the next turn
         _bestPossibleMove = null;
