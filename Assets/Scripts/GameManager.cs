@@ -11,7 +11,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
     public TextMeshProUGUI winText;
+    public TextMeshProUGUI scoreText;
     public bool gameWon;
+    public List<Cell> validCheckCells;
     private BoardManager bm;
     private bool isWhiteTurn = true;
     
@@ -40,6 +42,11 @@ public class GameManager : MonoBehaviour
                 bm.EndTurn();
             }
         }
+    }
+
+    public void UpdateScoreText()
+    {
+        scoreText.text = $"({bm.ai.movePos.x},{bm.ai.movePos.y}) : {bm.ai.score}";
     }
 
     void Start()

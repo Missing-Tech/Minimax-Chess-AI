@@ -16,11 +16,25 @@ public abstract class Piece : EventTrigger
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    private bool _isThreatened;
-    public GameObject pieceThreatening;
-
-    protected List<Piece> piecesThreatened = new List<Piece>();
+    public bool canJumpOverEnemyPieces = false;
     
+    public Sprite PieceSprite
+    {
+        get => pieceSprite;
+        set
+        {
+            //Updates the sprite image when it's changed
+            pieceSprite = value;
+            ChangeSprite();
+        }
+    }
+
+    public Color32 PieceColor => pieceColor;
+
+    protected void ChangeSprite()
+    {
+        GetComponent<Image>().sprite = pieceSprite;
+    }
 
     //Stores all possible directions in plaintext
     protected enum Directions
@@ -70,7 +84,7 @@ public abstract class Piece : EventTrigger
     };
 
     //The radius of possible moves, e.g. a king has a radius of 1 but a queen has a radius of 8
-    protected int radius = 1;
+    public int radius = 1;
 
     //Stores all possible directions a piece can move
     protected Directions[] availableDirections;
@@ -104,11 +118,6 @@ public abstract class Piece : EventTrigger
         //SetDirections - Handled by the piece
     }
 
-    protected virtual void BeingThreatened()
-    {
-        //Threatened - Handled by the piece
-    }
-
     public virtual void FindValidMoves(bool highlightCells)
     {
         //Loops through all possible directions a piece can move
@@ -126,8 +135,6 @@ public abstract class Piece : EventTrigger
                 {
                     newPos += convertDirectionToVector2[direction];
                 }
-                
-                //newPos += convertDirectionToVector2[direction];
 
                 //Checks if the move is on the board
                 if (IsInRange(newPos))
@@ -137,29 +144,39 @@ public abstract class Piece : EventTrigger
                     //Checks if the piece is on the other team
                     if (availableCell.CheckIfValid(pieceColor))
                     {
-                        if (highlightCells)
+                        bool isValid = true;
+                        int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+                        King king = BoardManager.Instance.kings[blackOrWhite];
+                        if (king.inCheck)
                         {
-                            //Outlines the possible moves
-                            availableCell.SetOutline(true);
-                        }
-                        //Stores all possible cells
-                        availableCells.Add(availableCell);
-                    }
-
-                    if (availableCell.CheckForAnyPiece())
-                    {
-                        //Marks the piece as threatened by another if one of the possible moves of this piece is on it
-                        if (availableCell.CheckIfOtherTeam(pieceColor))
-                        {
-                            availableCell.currentPiece.pieceThreatening = gameObject;
-                            piecesThreatened.Add(availableCell.currentPiece);
-                            if (!availableCell.currentPiece.IsThreatened)
+                            if (!GameManager.Instance.validCheckCells.Contains(availableCell))
                             {
-                                availableCell.currentPiece.IsThreatened = true;
+                                isValid = false;
                             }
                         }
-                        if (!canJumpOverPieces)
-                            break;
+                        if (isValid)
+                        {
+                            if (highlightCells)
+                            {
+                                //Outlines the possible moves
+                                availableCell.SetOutline(true);
+                            }
+                            //Stores all possible cells
+                            availableCells.Add(availableCell);
+                        }
+                    }
+
+                    //Used for checkmate edge case
+                    if (availableCell.CheckIfOtherTeam(pieceColor) && !canJumpOverEnemyPieces)
+                    {
+                        break;
+                    }
+                    
+                    //If there's a piece there and the piece can't jump over it
+                    if (availableCell.CheckForAnyPiece() && !canJumpOverPieces)
+                    {
+                        //Break out the loop
+                        break;
                     }
                 }
             }
@@ -199,44 +216,6 @@ public abstract class Piece : EventTrigger
         availableCells.Clear();
     }
 
-    public Sprite PieceSprite
-    {
-        get => pieceSprite;
-        set
-        {
-            //Updates the sprite image when it's changed
-            pieceSprite = value;
-            ChangeSprite();
-        }
-    }
-
-    public bool IsThreatened
-    {
-        get => _isThreatened;
-        set
-        {
-            _isThreatened = value;
-            if (_isThreatened)
-            {
-                BeingThreatened();
-            }
-        }
-    }
-    
-    public Color32 PieceColor => pieceColor;
-
-    protected void ChangeSprite()
-    {
-        GetComponent<Image>().sprite = pieceSprite;
-    }
-
-    public virtual bool CanTakePiece(Cell cell)
-    {
-        return true;
-    }
-    
-    #region Events
-
     protected bool IsTeamTurn()
     {
         if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)))
@@ -256,6 +235,14 @@ public abstract class Piece : EventTrigger
         return false;
     }
     
+    //Used for pawn
+    public virtual bool CanTakePiece(Cell cell)
+    {
+        return true;
+    }
+    
+    #region Events
+    
     public override void OnBeginDrag(PointerEventData eventData)
     {
         if(IsTeamTurn())
@@ -263,7 +250,12 @@ public abstract class Piece : EventTrigger
             base.OnBeginDrag(eventData);
             //Add the current cell the piece is on so you can put the piece back down
             availableCells.Add(cell);
-            FindValidMoves(true);
+            int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+            King king = BoardManager.Instance.kings[blackOrWhite];
+            if (!king.inCheck)
+            {
+                FindValidMoves(true);
+            }
             outline.SetActive(true);
         }
     }

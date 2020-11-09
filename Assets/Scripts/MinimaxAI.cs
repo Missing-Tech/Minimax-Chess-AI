@@ -12,7 +12,9 @@ public class MinimaxAI : MonoBehaviour
 {
     private BoardManager _bm; //Local reference to the BoardManager object
     private BoardState _bestPossibleMove; //The final move the AI decides to do
-    private int searchDepth = 7; //Increases search time exponentially
+    public float score;
+    public Vector2 movePos;
+    private int searchDepth = 5; //Increases search time exponentially
 
     private void Start()
     {
@@ -30,7 +32,7 @@ public class MinimaxAI : MonoBehaviour
 
         //Calls a recursive depth search on a tree of possible board states
         //The 'alpha' and 'beta' values are used for alpha-beta pruning which optimises the search
-        Minimax(searchDepth, currentBoardPosition, false, 
+        score = Minimax(searchDepth, currentBoardPosition, false, 
             -Mathf.Infinity,Mathf.Infinity);
 
         //Local reference to the cell grid
@@ -55,8 +57,12 @@ public class MinimaxAI : MonoBehaviour
             pieceToMove.Place(cellToMove);
         }
 
+        movePos = _bestPossibleMove.cellToMove.cellPos;
+
         //Resets the move for the next turn
         _bestPossibleMove = null;
+        
+        BoardManager.Instance.EndTurn();
     }
 
     /// <summary>
@@ -93,7 +99,7 @@ public class MinimaxAI : MonoBehaviour
                     alpha = Mathf.Max(alpha, eval);
                     if (beta <= alpha)
                         break;
-                }
+            }
             return maxEval;
         }
         else
@@ -149,9 +155,9 @@ public class MinimaxAI : MonoBehaviour
         //Joins together the white and black piece list
         var allPieces = _bm.whitePieces.Concat(_bm.blackPieces);
         //Finds the piece object
-        Piece pieceToMove = allPieces.ToList().Find(x => x == boardState.pieceToMove);
+        Piece pieceToMove = allPieces.ToList().Find(x => x == _bestPossibleMove.pieceToMove);
         //Finds the cell
-        Cell cellToMove = cellGrid[boardState.cellToMove.cellPos.x, boardState.cellToMove.cellPos.y];
+        Cell cellToMove = cellGrid[_bestPossibleMove.cellToMove.cellPos.x, _bestPossibleMove.cellToMove.cellPos.y];
 
         //If there's a piece that it can take
         if (cellToMove.CheckIfOtherTeam(pieceToMove.PieceColor))
@@ -159,11 +165,11 @@ public class MinimaxAI : MonoBehaviour
             //Adjust the score accordingly
             if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(White)))
             {
-                score -= BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
+                score += BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
             }
             else if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(Black)))
             {
-                score += BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
+                score -= BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
             }
         }
         
