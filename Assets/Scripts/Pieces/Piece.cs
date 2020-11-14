@@ -16,7 +16,7 @@ public abstract class Piece : EventTrigger
     protected Color32 pieceColor;
     protected GameObject outline;
     protected bool canJumpOverPieces = false;
-    public bool canJumpOverEnemyPieces = false;
+    public bool canJumpOverKing = false;
     
     public Sprite PieceSprite
     {
@@ -37,7 +37,7 @@ public abstract class Piece : EventTrigger
     }
 
     //Stores all possible directions in plaintext
-    protected enum Directions
+    public enum Directions
     {
         //Cardinal direction movement (clockwise)
         North,
@@ -93,7 +93,7 @@ public abstract class Piece : EventTrigger
     public List<Cell> availableCells = new List<Cell>();
 
     //Constructor to initialise the variables
-    public virtual void Init(Cell cell, Color32 pieceColour)
+    public void Init(Cell cell, Color32 pieceColour)
     {
         //Populates the possible directions array
         SetDirections();
@@ -127,13 +127,13 @@ public abstract class Piece : EventTrigger
             for (int i = 1; i <= radius; i++)
             {
                 //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
+                if (IsWhite(pieceColor))
                 {
-                    newPos -= convertDirectionToVector2[direction];
+                    newPos += convertDirectionToVector2[direction];
                 }
                 else
                 {
-                    newPos += convertDirectionToVector2[direction];
+                    newPos -= convertDirectionToVector2[direction];
                 }
 
                 //Checks if the move is on the board
@@ -145,7 +145,7 @@ public abstract class Piece : EventTrigger
                     if (availableCell.CheckIfValid(pieceColor))
                     {
                         bool isValid = true;
-                        int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+                        int blackOrWhite = IsWhite(pieceColor) ? 0 : 1;
                         King king = BoardManager.Instance.kings[blackOrWhite];
                         if (king.inCheck)
                         {
@@ -167,7 +167,7 @@ public abstract class Piece : EventTrigger
                     }
 
                     //Used for checkmate edge case
-                    if (availableCell.CheckIfOtherTeam(pieceColor) && !canJumpOverEnemyPieces)
+                    if (availableCell.CheckIfOtherTeam(pieceColor) && !canJumpOverKing)
                     {
                         break;
                     }
@@ -181,6 +181,11 @@ public abstract class Piece : EventTrigger
                 }
             }
         }
+    }
+
+    public bool IsWhite(Color32 colour)
+    {
+        return colour.Equals(ColourValue(ColourNames.White));
     }
 
     public void Place(Cell cellToMoveTo)
@@ -218,7 +223,7 @@ public abstract class Piece : EventTrigger
 
     protected bool IsTeamTurn()
     {
-        if (GameManager.Instance.IsWhiteTurn && pieceColor.Equals(ColourValue(ColourNames.White)))
+        if (GameManager.Instance.IsWhiteTurn && IsWhite(pieceColor))
         {
             return true;
         }
@@ -228,7 +233,7 @@ public abstract class Piece : EventTrigger
     protected bool IsInRange(Vector2 pos)
     {
         if (pos.x < 8 && pos.y < 8 &&
-            pos.x >= 0 && pos.y > 0)
+            pos.x >= 0 && pos.y >= 0)
         {
             return true;
         }
@@ -250,7 +255,7 @@ public abstract class Piece : EventTrigger
             base.OnBeginDrag(eventData);
             //Add the current cell the piece is on so you can put the piece back down
             availableCells.Add(cell);
-            int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+            int blackOrWhite = IsWhite(pieceColor) ? 0 : 1;
             King king = BoardManager.Instance.kings[blackOrWhite];
             if (!king.inCheck)
             {

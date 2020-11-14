@@ -53,7 +53,7 @@ public class Pawn : Piece
         {
             Cell newCell = cell.board.cellGrid[pos.x, pos.y];
             //White is 0, black is 1
-            int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+            int blackOrWhite = IsWhite(pieceColor) ? 0 : 1;
             King king = BoardManager.Instance.kings[blackOrWhite];
             if (king.inCheck)
             {
@@ -82,7 +82,7 @@ public class Pawn : Piece
         return false;
     }
 
-    void CheckForEnemy(Directions direction, int multiplier, bool highlightCells)
+    public void CheckForEnemy(Directions direction, int multiplier, bool highlightCells)
     {
         Vector2 checkPos = cell.cellPos + (convertDirectionToVector2[direction] * multiplier);
         if (IsInRange(checkPos))

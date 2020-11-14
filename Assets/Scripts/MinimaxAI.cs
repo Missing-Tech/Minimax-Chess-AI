@@ -7,6 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using static Colours.ColourNames;
+using Random = UnityEngine.Random;
 
 public class MinimaxAI : MonoBehaviour
 {
@@ -57,7 +58,7 @@ public class MinimaxAI : MonoBehaviour
             pieceToMove.Place(cellToMove);
         }
 
-        movePos = _bestPossibleMove.cellToMove.cellPos;
+        if (_bestPossibleMove != null) movePos = _bestPossibleMove.cellToMove.cellPos;
 
         //Resets the move for the next turn
         _bestPossibleMove = null;
@@ -138,12 +139,12 @@ public class MinimaxAI : MonoBehaviour
                 //If there is an active piece
                 if (cell.currentPiece.gameObject.activeSelf)
                 {
-                    if (cell.currentPiece.PieceColor.Equals(Colours.ColourValue(White)))
+                    if (cell.currentPiece.IsWhite(cell.currentPiece.PieceColor))
                     {
                         //Add the score of this piece
                         score += BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
                     }
-                    else if (cell.currentPiece.PieceColor.Equals(Colours.ColourValue(Black)))
+                    else if (!cell.currentPiece.IsWhite(cell.currentPiece.PieceColor))
                     {
                         //Minus the score of this piece
                         score -= BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
@@ -163,15 +164,17 @@ public class MinimaxAI : MonoBehaviour
         if (cellToMove.CheckIfOtherTeam(pieceToMove.PieceColor))
         {
             //Adjust the score accordingly
-            if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(White)))
+            if (cellToMove.currentPiece.IsWhite(cellToMove.currentPiece.PieceColor))
             {
                 score += BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
             }
-            else if (cellToMove.currentPiece.PieceColor.Equals(Colours.ColourValue(Black)))
+            else if (!cellToMove.currentPiece.IsWhite(cellToMove.currentPiece.PieceColor))
             {
                 score -= BoardManager.Instance.pieceEvaluation[cellToMove.currentPiece.GetType()];
             }
         }
+
+        score += Random.Range(-2, 2);
         
         return score;
     }

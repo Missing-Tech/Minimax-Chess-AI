@@ -91,8 +91,8 @@ public class BoardState
             {
                 bool isAITurn = _depth % 2 != 0; //Returns false if it's the AI's turn
                                                  //AI turns are odd depth values
-                bool canMoveThePiece = (piece.PieceColor.Equals(Colours.ColourValue(White)) && !isAITurn) ||
-                                       (piece.PieceColor.Equals(Colours.ColourValue(Black)) && isAITurn);
+                bool canMoveThePiece = (piece.IsWhite(piece.PieceColor) && !isAITurn) ||
+                                       (!piece.IsWhite(piece.PieceColor) && isAITurn);
                 if (!canMoveThePiece) //If it's on the AI's turn
                 {
                     piece.FindValidMoves(false);
