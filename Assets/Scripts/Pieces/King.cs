@@ -125,25 +125,7 @@ public class King : Piece
                         //Fixes edge cases with pawns
                         if (isPawn)
                         {
-                            Pawn pawn = piece.GetComponent<Pawn>();
-                            Vector2Int pawnCellPos = pawn.cell.cellPos;
-                            Cell[,] cellGrid = BoardManager.Instance.board.cellGrid;
-                            if (IsWhite(piece.PieceColor))
-                            {
-                                
-                                pawn.availableCells.Add(cellGrid[pawnCellPos.x + 1,pawnCellPos.y + 1]);
-                                pawn.availableCells.Add(cellGrid[pawnCellPos.x - 1,pawnCellPos.y + 1]);
-                                pawn.availableCells.Remove(cellGrid[pawnCellPos.x,pawnCellPos.y + 1]);
-                                pawn.availableCells.Remove(cellGrid[pawnCellPos.x,pawnCellPos.y + 2]);
-                            }
-                            else
-                            {
-                                pawn.availableCells.Add(cellGrid[pawnCellPos.x - 1,pawnCellPos.y - 1]);
-                                pawn.availableCells.Add(cellGrid[pawnCellPos.x + 1,pawnCellPos.y - 1]);
-                                pawn.availableCells.Remove(cellGrid[pawnCellPos.x,pawnCellPos.y - 1]);
-                                pawn.availableCells.Remove(cellGrid[pawnCellPos.x,pawnCellPos.y - 2]);
-                            }
-                            
+                            CheckPawnPositions(piece);
                         }
                         
                         //See if one of the piece's moves is the cell
@@ -166,7 +148,58 @@ public class King : Piece
         return false;
     }
 
-    private void OnDisable()
+    void CheckPawnPositions(Piece piece)
+    {
+        Pawn pawn = piece.GetComponent<Pawn>();
+        Vector2Int pawnCellPos = pawn.cell.cellPos;
+        Cell[,] cellGrid = BoardManager.Instance.board.cellGrid;
+
+        //All of the vectors necessary to check positions
+        Vector2Int rUpDiag, lUpDiag, rDownDiag, lDownDiag,forward2, back2;
+        rUpDiag = new Vector2Int(pawnCellPos.x + 1,pawnCellPos.y + 1);
+        lUpDiag = new Vector2Int(pawnCellPos.x - 1, pawnCellPos.y + 1);
+        rDownDiag = new Vector2Int(pawnCellPos.x + 1,pawnCellPos.y - 1);
+        lDownDiag = new Vector2Int(pawnCellPos.x - 1, pawnCellPos.y - 1);
+        forward2 = new Vector2Int(pawnCellPos.x,pawnCellPos.y + 2);
+        back2 = new Vector2Int(pawnCellPos.x,pawnCellPos.y - 2);
+        
+        if (IsWhite(piece.PieceColor))
+        {
+            if (IsInRange(rUpDiag))
+            {
+                pawn.availableCells.Add(cellGrid[rUpDiag.x, rUpDiag.y]);
+            }
+            if (IsInRange(lUpDiag))
+            {
+                pawn.availableCells.Add(cellGrid[lUpDiag.x, lUpDiag.y]);
+            }
+            if (IsInRange(forward2))
+            {
+                pawn.availableCells.Remove(cellGrid[forward2.x,forward2.y - 1]);
+                pawn.availableCells.Remove(cellGrid[forward2.x,forward2.y]);
+            }
+        }
+        else
+        {
+            if (IsInRange(rDownDiag))
+            {
+                pawn.availableCells.Add(cellGrid[rDownDiag.x, rDownDiag.y]);
+            }
+
+            if (IsInRange(lDownDiag))
+            {
+                pawn.availableCells.Add(cellGrid[lDownDiag.x, lDownDiag.y]);
+
+                if (IsInRange(back2))
+                {
+                    pawn.availableCells.Remove(cellGrid[back2.x, back2.y + 1]);
+                    pawn.availableCells.Remove(cellGrid[back2.x, back2.y]);
+                }
+            }
+        }
+    }
+    
+    void OnDisable()
     {
         GameManager.Instance.Win(pieceColor.Equals(ColourValue(ColourNames.White)));
     }
@@ -179,6 +212,11 @@ public class King : Piece
         {
             if (CheckEveryDirection(availableCell))
             {
+                if (GameManager.Instance.validCheckCells.Contains(availableCell))
+                {
+                    availableCells.Remove(availableCell);
+                    break;
+                }
                 if (highlightCells)
                 {
                     availableCell.SetOutline(false);
