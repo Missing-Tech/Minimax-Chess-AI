@@ -121,7 +121,7 @@ public class BoardState
 
                         //Create a new board state as a child
                         BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
-                            newCellGrid, piece, availableCell);
+                            newCellGrid, piece, availableCell, );
                         localChildrenStates.Add(childBoardState);
                     }
                     piece.ClearCells();
