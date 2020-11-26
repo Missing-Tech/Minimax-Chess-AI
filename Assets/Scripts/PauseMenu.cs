@@ -7,6 +7,11 @@ public class PauseMenu : MonoBehaviour
 {
     public bool isPaused = false;
     public GameObject pauseMenu;
+
+    private void Start()
+    {
+        IsPaused = false;
+    }
     
     public bool IsPaused
     {
@@ -16,8 +21,8 @@ public class PauseMenu : MonoBehaviour
         }
         set
         {
-            UpdatePauseMenu();
             isPaused = value;
+            UpdatePauseMenu();
         }
     }
 
