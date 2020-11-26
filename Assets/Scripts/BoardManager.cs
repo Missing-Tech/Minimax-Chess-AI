@@ -110,30 +110,24 @@ public class BoardManager : MonoBehaviour
 
     public void EndTurn()
     {
+        GameManager gm = GameManager.Instance;
         foreach (var king in kings)
         {
             if (king.IsCheckmate)
             {
-                bool _isWhite = king.PieceColor.Equals(Colours.ColourValue(White));
+                bool _isWhite = king.IsWhite(king.PieceColor);
                 Debug.Log("checkmate");
-                GameManager.Instance.Win(_isWhite);
+                gm.Win(_isWhite);
             }
             //Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
         }
+
+        gm.validCheckCells = null;
+        gm.UpdateScoreText();
         
-        GameManager.Instance.UpdateScoreText();
-        
-        if (!GameManager.Instance.IsWhiteTurn)
+        if (!gm.IsWhiteTurn)
         {
             ai.DoTurn();
-        }
-    }
-
-    public void RefreshBoard()
-    {
-        foreach (var cell in board.cellGrid)
-        {
-            cell.Refresh();
         }
     }
 
