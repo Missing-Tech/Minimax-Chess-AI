@@ -48,12 +48,9 @@ public class King : Piece
 
         if (CheckEveryDirection(cell))
         {
+            //If the king is under attack from another piece
             inCheck = true;
             FindValidMoves(false);
-            if (availableCells.Count == 0)
-            {
-                _isCheckmate = true;
-            }
             
             //Checks if the cells it can move into are in danger
             int noOfDangerCells = 0;
@@ -66,7 +63,7 @@ public class King : Piece
             }
 
             //If all of the cells it can move into are dangerous then it's in checkmate
-            if (noOfDangerCells == availableCells.Count)
+            if (noOfDangerCells == availableCells.Count || availableCells.Count == 0)
             {
                 _isCheckmate = true;
             }
@@ -84,60 +81,127 @@ public class King : Piece
     //Returns true if the cell is in danger
     bool CheckEveryDirection(Cell cellToCheck)
     {
+        //Checks every direction for an enemy piecec
         foreach (Directions direction in (Directions[]) Enum.GetValues(typeof(Directions)))
         {
             bool isKnightDirection = direction.ToString().Contains("L");
             Vector2Int checkCellPos = cellToCheck.cellPos;
             for (int i = 1; i <= 8; i++)
             {
+                //Breaks out the loop if it's a knight after radius 1
                 if (isKnightDirection && i > 1)
                 {
                     break;
                 }
-                //Flips the vector if the player is on the black side
-                if (pieceColor.Equals(ColourValue(ColourNames.Black)))
-                {
-                    checkCellPos -= Vector2Int.RoundToInt(convertDirectionToVector2[direction]);
-                }
-                else
-                {
-                    checkCellPos += Vector2Int.RoundToInt(convertDirectionToVector2[direction]);
-                }
+                
+                //Adds direction to the position to check
+                checkCellPos += Vector2Int.RoundToInt(convertDirectionToVector2[direction]);
+                
                 Cell checkCell = null;
+                //If the position is on the board
                 if (IsInRange(checkCellPos))
                 {
+                    //Store the cell locally
                     checkCell = BoardManager.Instance.board.cellGrid[checkCellPos.x, checkCellPos.y];
-                }
-                if (checkCell != null)
-                {
+                    
+                    //If the cell contains a piece on the other team
                     if (checkCell.CheckIfOtherTeam(pieceColor))
                     {
                         Piece piece = checkCell.currentPiece;
+                        bool isPawn = piece.GetComponent<Piece>().GetType() == typeof(Pawn);
+                        //Immediately know that the piece can't attack the cell
                         if (i > piece.radius)
                         {
                             break;
                         }
                         //Temporarily lets the piece jump over other pieces so that the king
                         //Stops an edge case where the king can move away from a piece but still be in check
-                        bool couldJumpOverPieces = piece.canJumpOverEnemyPieces;
-                        piece.canJumpOverEnemyPieces = true;
+                        bool couldJumpOverPieces = piece.canJumpOverKing;
+                        piece.canJumpOverKing = true;
                         
+                        //Find all valid moves for the piece
                         piece.FindValidMoves(false);
+
+                        //Fixes edge cases with pawns
+                        if (isPawn)
+                        {
+                            CheckPawnPositions(piece);
+                        }
+                        
+                        //See if one of the piece's moves is the cell
                         if (piece.availableCells.Contains(cellToCheck))
                         {
+                            //If it's attacking the king piece
                             if (cellToCheck == cell)
                             {
+                                //Make it a cell that can be attacked by other pieces
                                 GameManager.Instance.validCheckCells.Add(piece.cell);
                             }
-                            piece.canJumpOverEnemyPieces = couldJumpOverPieces;
+                            piece.canJumpOverKing = couldJumpOverPieces;
                             return true;
                         }
-                        piece.canJumpOverEnemyPieces = couldJumpOverPieces;
+                        piece.canJumpOverKing = couldJumpOverPieces;
                     }
                 }
             }
         }
         return false;
+    }
+
+    void CheckPawnPositions(Piece piece)
+    {
+        Pawn pawn = piece.GetComponent<Pawn>();
+        Vector2Int pawnCellPos = pawn.cell.cellPos;
+        Cell[,] cellGrid = BoardManager.Instance.board.cellGrid;
+
+        //All of the vectors necessary to check positions
+        Vector2Int rUpDiag, lUpDiag, rDownDiag, lDownDiag,forward2, back2;
+        rUpDiag = new Vector2Int(pawnCellPos.x + 1,pawnCellPos.y + 1);
+        lUpDiag = new Vector2Int(pawnCellPos.x - 1, pawnCellPos.y + 1);
+        rDownDiag = new Vector2Int(pawnCellPos.x + 1,pawnCellPos.y - 1);
+        lDownDiag = new Vector2Int(pawnCellPos.x - 1, pawnCellPos.y - 1);
+        forward2 = new Vector2Int(pawnCellPos.x,pawnCellPos.y + 2);
+        back2 = new Vector2Int(pawnCellPos.x,pawnCellPos.y - 2);
+        
+        if (IsWhite(piece.PieceColor))
+        {
+            if (IsInRange(rUpDiag))
+            {
+                pawn.availableCells.Add(cellGrid[rUpDiag.x, rUpDiag.y]);
+            }
+            if (IsInRange(lUpDiag))
+            {
+                pawn.availableCells.Add(cellGrid[lUpDiag.x, lUpDiag.y]);
+            }
+            if (IsInRange(forward2))
+            {
+                pawn.availableCells.Remove(cellGrid[forward2.x,forward2.y - 1]);
+                pawn.availableCells.Remove(cellGrid[forward2.x,forward2.y]);
+            }
+        }
+        else
+        {
+            if (IsInRange(rDownDiag))
+            {
+                pawn.availableCells.Add(cellGrid[rDownDiag.x, rDownDiag.y]);
+            }
+
+            if (IsInRange(lDownDiag))
+            {
+                pawn.availableCells.Add(cellGrid[lDownDiag.x, lDownDiag.y]);
+
+                if (IsInRange(back2))
+                {
+                    pawn.availableCells.Remove(cellGrid[back2.x, back2.y + 1]);
+                    pawn.availableCells.Remove(cellGrid[back2.x, back2.y]);
+                }
+            }
+        }
+    }
+    
+    void OnDisable()
+    {
+        GameManager.Instance.Win(pieceColor.Equals(ColourValue(ColourNames.White)));
     }
 
     public override void FindValidMoves(bool highlightCells)
@@ -148,6 +212,11 @@ public class King : Piece
         {
             if (CheckEveryDirection(availableCell))
             {
+                if (GameManager.Instance.validCheckCells.Contains(availableCell))
+                {
+                    availableCells.Remove(availableCell);
+                    break;
+                }
                 if (highlightCells)
                 {
                     availableCell.SetOutline(false);
