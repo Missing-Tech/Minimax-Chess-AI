@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Rook : Piece
+﻿public class Rook : Piece
 {
+    //Rook Class
     protected override void SetDirections()
     {
         base.SetDirections();

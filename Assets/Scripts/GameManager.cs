@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -10,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get { return _instance; } }
 
+    //Stores reference to UI elements
     public TextMeshProUGUI winText;
     public TextMeshProUGUI scoreText;
     public bool gameWon;
@@ -33,6 +32,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsWhiteTurn
     {
+        //Property to check if it's white's turn
         get => isWhiteTurn;
         set
         {
@@ -46,20 +46,25 @@ public class GameManager : MonoBehaviour
 
     public void UpdateScoreText()
     {
+        //Sets the UI text
         scoreText.text = $"({bm.ai.movePos.x},{bm.ai.movePos.y}) : {bm.ai.score}";
     }
 
     void Start()
     {
+        //Initialises the board at the start of the game
         board.InitBoard();
     }
 
     private void Update()
     {
+        //If the game is over
         if (gameWon)
         {
+            //And enter is pressed
             if (Input.GetKeyDown(KeyCode.Return))
             {
+                //Reset the board
                 bm.ResetBoard();
             }
         }
@@ -67,6 +72,7 @@ public class GameManager : MonoBehaviour
 
     public void Win(bool isWhite)
     {
+        //Sets the UI if a player wins
         winText.gameObject.SetActive(true);
         winText.text = isWhite ? "BLACK WINS" : "WHITE WINS";
         gameWon = true;

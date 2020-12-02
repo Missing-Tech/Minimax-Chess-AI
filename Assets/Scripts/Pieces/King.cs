@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using static Colours;
 
 public class King : Piece
@@ -22,7 +18,7 @@ public class King : Piece
 
     private void Start()
     {
-        isWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White));
+        isWhite = pieceColor.Equals(ColourValue(ColourNames.White));
     }
 
     protected override void SetDirections()
@@ -32,7 +28,7 @@ public class King : Piece
         availableDirections = new Directions[]
         {   
             Directions.North, 
-            Directions.NorthEast, 
+            Directions.NorthEast,
             Directions.East,
             Directions.SouthEast,
             Directions.South,
@@ -42,6 +38,7 @@ public class King : Piece
         };
     }
 
+    //Check for checkmate (not finished)
     bool CheckIfCheckmate()
     {
         bool _isCheckmate = false;
@@ -148,6 +145,7 @@ public class King : Piece
         return false;
     }
 
+<<<<<<< Updated upstream
     void CheckPawnPositions(Piece piece)
     {
         Pawn pawn = piece.GetComponent<Pawn>();
@@ -204,6 +202,9 @@ public class King : Piece
         GameManager.Instance.Win(pieceColor.Equals(ColourValue(ColourNames.White)));
     }
 
+=======
+    //Looks for valid moves
+>>>>>>> Stashed changes
     public override void FindValidMoves(bool highlightCells)
     {
         base.FindValidMoves(highlightCells);

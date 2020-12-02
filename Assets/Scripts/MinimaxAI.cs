@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using static Colours.ColourNames;
 using Random = UnityEngine.Random;
@@ -67,7 +62,7 @@ public class MinimaxAI : MonoBehaviour
     }
 
     /// <summary>
-    /// Recursive search to find the best move
+    /// Recursive depth-first search down the tree to find the best move
     /// </summary>
     /// <param name="depth">Number of moves it's looking ahead</param>
     /// <param name="boardState">The future board state</param>

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -232,6 +231,7 @@ public abstract class Piece : EventTrigger
 
     protected bool IsInRange(Vector2 pos)
     {
+        //Checks if the position is on the board
         if (pos.x < 8 && pos.y < 8 &&
             pos.x >= 0 && pos.y >= 0)
         {
@@ -255,20 +255,26 @@ public abstract class Piece : EventTrigger
             base.OnBeginDrag(eventData);
             //Add the current cell the piece is on so you can put the piece back down
             availableCells.Add(cell);
+<<<<<<< Updated upstream
             int blackOrWhite = IsWhite(pieceColor) ? 0 : 1;
+=======
+            /*int blackOrWhite = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.White)) ? 0 : 1;
+>>>>>>> Stashed changes
             King king = BoardManager.Instance.kings[blackOrWhite];
             if (!king.inCheck)
-            {
+            {*/
                 FindValidMoves(true);
-            }
+            //}
             outline.SetActive(true);
         }
     }
 
+    //During the drag event
     public override void OnDrag(PointerEventData eventData)
     {
         if (IsTeamTurn())
         {
+            //Moves the piece to the position of the cursor
             base.OnDrag(eventData);
             transform.position = eventData.position;
         }

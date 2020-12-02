@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal.VersionControl;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using static Colours.ColourNames;
 
 /// <summary>
