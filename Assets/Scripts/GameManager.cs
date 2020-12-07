@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI winText;
     public TextMeshProUGUI scoreText;
     public bool gameWon;
-    public List<Cell> validCheckCells;
     private BoardManager bm;
     private bool isWhiteTurn = true;
     
@@ -25,7 +24,6 @@ public class GameManager : MonoBehaviour
         } else {
             _instance = this;
         }
-
         bm = FindObjectOfType<BoardManager>();
     }
 
