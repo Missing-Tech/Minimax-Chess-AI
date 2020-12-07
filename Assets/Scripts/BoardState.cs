@@ -21,6 +21,8 @@ public class BoardState
     public List<BoardState> childrenStates;
     public Piece pieceToMove;
     public Cell cellToMove;
+    public bool whiteCheck = false;
+    public bool blackCheck = false;
 
     public List<BoardState> ChildrenStates
     {
@@ -104,6 +106,26 @@ public class BoardState
                         Cell[,] newCellGrid = new Cell[8,8];
                         newCellGrid = _cellGrid;
 
+                        Piece attackedPiece;
+                        
+                        //If there's a piece on the cell
+                        if (availableCell.currentPiece != null)
+                        {
+                            attackedPiece = availableCell.currentPiece;
+                            //If the piece on the cell is a king
+                            if (attackedPiece.GetType() == typeof(King))
+                            {
+                                //If the piece is on the other team
+                                if (availableCell.CheckIfOtherTeam(piece.PieceColor))
+                                {
+                                    if (attackedPiece.IsWhite(attackedPiece.PieceColor))
+                                        whiteCheck = true;
+                                    else
+                                        blackCheck = true;
+                                }
+                            }
+                        }
+                        
                         //Create a new board state as a child
                         BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
                             newCellGrid, piece, availableCell);

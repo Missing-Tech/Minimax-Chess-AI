@@ -12,6 +12,8 @@ public class BoardManager : MonoBehaviour
 
     public static BoardManager Instance { get { return _instance; } }
     
+    public GameObject checkText;
+    
     public Board board;
     public GameObject pieceObject;
 
@@ -113,16 +115,18 @@ public class BoardManager : MonoBehaviour
         GameManager gm = GameManager.Instance;
         foreach (var king in kings)
         {
+            if (king.inCheck)
+                checkText.SetActive(true);
+            else
+                checkText.SetActive(false);
+            
             if (king.IsCheckmate)
             {
                 bool _isWhite = king.IsWhite(king.PieceColor);
-                Debug.Log("checkmate");
                 gm.Win(_isWhite);
             }
-            //Debug.Log("in check: " + king.inCheck + "   " + king.PieceColor);
         }
 
-        gm.validCheckCells = null;
         gm.UpdateScoreText();
         
         if (!gm.IsWhiteTurn)
