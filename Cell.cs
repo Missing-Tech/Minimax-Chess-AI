@@ -87,6 +87,15 @@ public class Cell : MonoBehaviour
       return true;
    }
    
+   public bool CheckIfKing()
+   {
+      if (currentPiece != null && currentPiece.GetComponent<Piece>().GetType() == typeof(King))
+      {
+         return true;
+      }
+      return false;
+   }
+   
    public Vector2 GetWorldPos()
    {
       return transform.position;

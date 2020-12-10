@@ -12,6 +12,8 @@ public class BoardManager : MonoBehaviour
 
     public static BoardManager Instance { get { return _instance; } }
     
+    public GameObject checkText;
+    
     public Board board;
     public GameObject pieceObject;
 
@@ -24,6 +26,8 @@ public class BoardManager : MonoBehaviour
     public Sprite[] pieceSprites;
 
     private int[] _royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
+
+    public List<Cell> validCheckCells;
 
     public List<King> kings;
 
@@ -110,31 +114,27 @@ public class BoardManager : MonoBehaviour
 
     public void EndTurn()
     {
+        validCheckCells.Clear();
+        GameManager gm = GameManager.Instance;
         foreach (var king in kings)
         {
+            if (king.inCheck)
+                checkText.SetActive(true);
+            else
+                checkText.SetActive(false);
+            
             if (king.IsCheckmate)
             {
-                bool _isWhite = king.PieceColor.Equals(Colours.ColourValue(White));
-                Debug.Log("checkmate");
-                GameManager.Instance.Win(_isWhite);
+                bool _isWhite = king.IsWhite(king.PieceColor);
+                gm.Win(_isWhite);
             }
         }
 
-        //GameManager.Instance.validCheckCells = null;
-
-        GameManager.Instance.UpdateScoreText();
+        gm.UpdateScoreText();
         
-        if (!GameManager.Instance.IsWhiteTurn)
+        if (!gm.IsWhiteTurn)
         {
             ai.DoTurn();
-        }
-    }
-
-    public void RefreshBoard()
-    {
-        foreach (var cell in board.cellGrid)
-        {
-            cell.Refresh();
         }
     }
 
