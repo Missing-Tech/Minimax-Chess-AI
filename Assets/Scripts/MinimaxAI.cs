@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal.VersionControl;
 using UnityEngine;
-using static Colours.ColourNames;
 using Random = UnityEngine.Random;
 
 public class MinimaxAI : MonoBehaviour

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Knight : Piece
+﻿public class Knight : Piece
 {
     protected override void SetDirections()
     {

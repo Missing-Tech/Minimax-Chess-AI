@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal.VersionControl;
-using UnityEngine;
-using static Colours.ColourNames;
+﻿using System.Collections.Generic;
 
 /// <summary>
 /// This class is used for future board states so that the AI can predict the best move for the future
