@@ -19,7 +19,6 @@ public abstract class Piece : EventTrigger
     
     public Sprite PieceSprite
     {
-        get => pieceSprite;
         set
         {
             //Updates the sprite image when it's changed
@@ -143,26 +142,15 @@ public abstract class Piece : EventTrigger
                     //Checks if the piece is on the other team
                     if (availableCell.CheckIfValid(pieceColor))
                     {
-                        bool isValid = true;
                         int blackOrWhite = IsWhite(pieceColor) ? 0 : 1;
                         King king = BoardManager.Instance.kings[blackOrWhite];
-                        if (king.inCheck)
-                        {
-                            if (!GameManager.Instance.validCheckCells.Contains(availableCell))
-                            {
-                                isValid = false;
-                            }
-                        }
-                        if (isValid)
-                        {
-                            if (highlightCells)
+                        if (highlightCells)
                             {
                                 //Outlines the possible moves
                                 availableCell.SetOutline(true);
                             }
                             //Stores all possible cells
                             availableCells.Add(availableCell);
-                        }
                     }
 
                     //Used for checkmate edge case
@@ -194,7 +182,6 @@ public abstract class Piece : EventTrigger
         if (cell != cellLastTurn)
         {
             EndTurn();
-            //FindValidMoves(false);
         }
     }
 

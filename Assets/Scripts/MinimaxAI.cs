@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using static Colours.ColourNames;
 using Random = UnityEngine.Random;
 
 public class MinimaxAI : MonoBehaviour
