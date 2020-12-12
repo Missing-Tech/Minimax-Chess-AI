@@ -21,7 +21,8 @@ public class BoardState
     public List<BoardState> childrenStates;
     public Piece pieceToMove;
     public Cell cellToMove;
-    public bool gameOver = false;
+    public bool whiteCheck = false;
+    public bool blackCheck = false;
 
     public List<BoardState> ChildrenStates
     {
@@ -59,7 +60,6 @@ public class BoardState
         this.pieceToMove = pieceToMove;
         this.cellToMove = cellToMove;
         _parentState = parentState;
-        gameOver = IsGameOver();
     }
 
     /// <summary>
@@ -76,19 +76,6 @@ public class BoardState
         pieceToMove = null;
         cellToMove = null;
         _cellGrid = cellGrid;
-        gameOver = IsGameOver();
-    }
-
-    private bool IsGameOver()
-    {
-        foreach (var cell in _cellGrid)
-        {
-            if (cell.currentPiece.GetComponent<Piece>().GetType() == typeof(King))
-            {
-                return cell.currentPiece.GetComponent<King>().IsCheckmate;
-            }
-        }
-        return false;
     }
 
     /// <summary>
@@ -106,8 +93,8 @@ public class BoardState
             {
                 bool isAITurn = _depth % 2 != 0; //Returns false if it's the AI's turn
                                                  //AI turns are odd depth values
-                bool canMoveThePiece = (piece.PieceColor.Equals(Colours.ColourValue(White)) && !isAITurn) ||
-                                       (piece.PieceColor.Equals(Colours.ColourValue(Black)) && isAITurn);
+                bool canMoveThePiece = (piece.IsWhite(piece.PieceColor) && !isAITurn) ||
+                                       (!piece.IsWhite(piece.PieceColor) && isAITurn);
                 if (!canMoveThePiece) //If it's on the AI's turn
                 {
                     piece.FindValidMoves(false);
@@ -116,12 +103,35 @@ public class BoardState
                     foreach (var availableCell in availableCells)
                     {
                         //Create a local cell grid
-                        Cell[,] newCellGrid = new Cell[8,8];
+                        Cell[,] newCellGrid = new Cell[8, 8];
                         newCellGrid = _cellGrid;
+
+                        Piece attackedPiece;
+
+                        //If there's a piece on the cell
+                        if (availableCell.currentPiece != null)
+                        {
+                            attackedPiece = availableCell.currentPiece;
+                            //If the piece on the cell is a king
+                            if (attackedPiece.GetType() == typeof(King))
+                            {
+                                //If the piece is on the other team
+                                if (availableCell.CheckIfOtherTeam(piece.PieceColor))
+                                {
+                                    if (attackedPiece.IsWhite(attackedPiece.PieceColor))
+                                        whiteCheck = true;
+                                    else
+                                        blackCheck = true;
+
+                                    List<Cell> _validCheckCells = BoardManager.Instance.validCheckCells;
+                                    _validCheckCells.Add(piece.cell);
+                                }
+                            }
+                        }
 
                         //Create a new board state as a child
                         BoardState childBoardState = new BoardState(_maxDepth, _depth - 1, _parentState,
-                            newCellGrid, piece, availableCell, );
+                            newCellGrid, piece, availableCell);
                         localChildrenStates.Add(childBoardState);
                     }
                     piece.ClearCells();
