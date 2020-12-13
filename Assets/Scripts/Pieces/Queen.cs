@@ -1,6 +1,5 @@
 ﻿public class Queen : Piece
 {
-    //Queen Class
     protected override void SetDirections()
     {
         base.SetDirections();

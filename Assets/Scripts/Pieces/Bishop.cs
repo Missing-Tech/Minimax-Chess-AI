@@ -1,6 +1,5 @@
 ﻿public class Bishop : Piece
 {
-    //Bishop class
     protected override void SetDirections()
     {
         base.SetDirections();

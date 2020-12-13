@@ -61,7 +61,7 @@ public class MinimaxAI : MonoBehaviour
     }
 
     /// <summary>
-    /// Recursive depth-first search down the tree to find the best move
+    /// Recursive search to find the best move
     /// </summary>
     /// <param name="depth">Number of moves it's looking ahead</param>
     /// <param name="boardState">The future board state</param>
