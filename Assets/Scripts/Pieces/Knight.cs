@@ -1,6 +1,5 @@
 ﻿public class Knight : Piece
 {
-    //Knight class
     protected override void SetDirections()
     {
         base.SetDirections();
