@@ -1,5 +1,6 @@
 ﻿public class Rook : Piece
 {
+    //Rook Class
     protected override void SetDirections()
     {
         base.SetDirections();

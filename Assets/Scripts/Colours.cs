@@ -5,7 +5,6 @@ public class Colours
 {
 
     //Stores references to Color32 values to be used elsewhere
-
     public enum ColourNames
     {
         PaleOrange,
@@ -17,6 +16,7 @@ public class Colours
         Black,
     }
     
+    //Hashtable to store all 
     private static Hashtable colourValues = new Hashtable
     {
         {ColourNames.PaleOrange, new Color32(242,203,168,255)},

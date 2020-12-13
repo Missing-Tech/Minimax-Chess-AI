@@ -3,16 +3,17 @@ using static Colours.ColourNames;
 
 public class Board : MonoBehaviour
 {
+    //Creates a singleton instance so it can be globally accessed
     private static Board _instance;
-
     public static Board Instance { get { return _instance; } }
-    
+    //Stores the cell object
     public GameObject cellPrefab;
-    
+    //2D array to store the grid
     public Cell[,] cellGrid = new Cell[8,8];
 
     private void Awake()
     {
+        //Singleton pattern
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
@@ -53,9 +54,11 @@ public class Board : MonoBehaviour
                 if (y % 2 == 0)
                     offsetX += 1;
 
+                //Colours every other cell to make the checkboard
                 cellGrid[offsetX, y].cellImage.color = Colours.ColourValue(PaleBrown);
             }
         }
+        //Spawns the pieces
         FindObjectOfType<BoardManager>().SpawnPieces();
     }
     
