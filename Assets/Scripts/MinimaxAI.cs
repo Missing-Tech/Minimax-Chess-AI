@@ -128,20 +128,21 @@ public class MinimaxAI : MonoBehaviour
         //Loops through every cell on the board
         foreach (var cell in cellGrid)
         {
-            if (cell.currentPiece != null)
+            Piece piece = cell.currentPiece;
+            if (piece != null)
             {
                 //If there is an active piece
-                if (cell.currentPiece.gameObject.activeSelf)
+                if (piece.gameObject.activeSelf)
                 {
-                    if (cell.currentPiece.IsWhite(cell.currentPiece.PieceColor))
+                    if (piece.IsWhite(piece.PieceColor))
                     {
                         //Add the score of this piece
-                        score += BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
+                        score += BoardManager.Instance.pieceEvaluation[piece.GetType()];
                     }
                     else if (!cell.currentPiece.IsWhite(cell.currentPiece.PieceColor))
                     {
                         //Minus the score of this piece
-                        score -= BoardManager.Instance.pieceEvaluation[cell.currentPiece.GetType()];
+                        score -= BoardManager.Instance.pieceEvaluation[piece.GetType()];
                     }
                 }
             }
