@@ -39,9 +39,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateScoreText()
+    public void UpdateScoreText(float score = -10101)
     {
-        scoreText.text = $"({bm.ai.movePos.x},{bm.ai.movePos.y}) : {bm.ai.score}";
+        //If the value of score hasn't changed
+        if (score == -10101)
+        {
+            score = bm.ai.score;
+        }
+        scoreText.text = $"({bm.ai.movePos.x},{bm.ai.movePos.y}) : {score}";
     }
 
     void Start()
@@ -53,9 +58,12 @@ public class GameManager : MonoBehaviour
     {
         if (gameWon)
         {
+            //Resets the board if the user presses enter after the game has been won
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 bm.ResetBoard();
+                UpdateScoreText(0);
+                bm.canMove = true;
             }
         }
     }
@@ -64,6 +72,7 @@ public class GameManager : MonoBehaviour
     {
         winText.gameObject.SetActive(true);
         winText.text = isWhite ? "BLACK WINS" : "WHITE WINS";
+        bm.canMove = false;
         gameWon = true;
     }
 

@@ -24,8 +24,8 @@ public class BoardManager : MonoBehaviour
     public Sprite[] pieceSprites;
 
     private int[] _royalRow = {0, 1, 2, 3, 4, 2, 1, 0};
-
     public List<King> kings;
+    public bool canMove = true;
 
     private Dictionary<int, Type> pieceConverter = new Dictionary<int, Type>()
     {

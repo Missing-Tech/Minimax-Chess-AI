@@ -26,19 +26,21 @@ public class Pawn : Piece
     {
         int teamMultiplier;
         teamMultiplier = pieceColor.Equals(Colours.ColourValue(Colours.ColourNames.Black)) ? -1 : 1;
-
-        if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
+        if (IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier * 2)))
         {
-            if (_isFirstMove && IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier * 2)) 
-                && !cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (2 * teamMultiplier)].CheckForAnyPiece())
+            if (!cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (1 * teamMultiplier)].CheckForAnyPiece())
             {
-                AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
-            }
-            if (IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier)))
-            {
-                AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier), highlightCells);
+                if (_isFirstMove && !cell.board.cellGrid[cell.cellPos.x, cell.cellPos.y + (2 * teamMultiplier)].CheckForAnyPiece())
+                {
+                    AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier * 2), highlightCells);
+                }
+                if (IsInRange(cell.cellPos + (Vector2Int.up * teamMultiplier)))
+                {
+                    AddAvailableCell(cell.cellPos + (Vector2Int.up * teamMultiplier), highlightCells);
+                }
             }
         }
+        
 
         CheckForEnemy(Directions.NorthEast, 1 * teamMultiplier, highlightCells);
         CheckForEnemy(Directions.NorthWest, 1 * teamMultiplier, highlightCells);

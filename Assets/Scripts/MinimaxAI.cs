@@ -72,7 +72,9 @@ public class MinimaxAI : MonoBehaviour
     private float Minimax(int depth, BoardState boardState, bool isMaximisingPlayer, float alpha, float beta)
     {
         //White is maximising, black is minimising
-        if (depth == 1)
+        //Ends the search if it's at the top of the tree or if the position is a game over
+        //Checks if the depth is 1 as 0 is the current board state
+        if (depth == 1 || boardState.blackCheck || boardState.whiteCheck)
         {
             //Gives the board state the piece and cell to move
             _bestPossibleMove = boardState.ParentState;
@@ -169,8 +171,15 @@ public class MinimaxAI : MonoBehaviour
             }
         }
 
-        score += Random.Range(-2, 2);
-        
+        //Encourages the AI to put the player in check and to take itself out of check
+        if (boardState.blackCheck)
+        {
+            score = 1000;
+        } else if (boardState.whiteCheck)
+        {
+            score = -1000;
+        }
+
         return score;
     }
 }
